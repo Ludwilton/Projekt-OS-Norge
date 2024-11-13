@@ -26,7 +26,7 @@ def plot_top_medals(df: pd.DataFrame, limit=10, group_by='NOC') -> None:
     medal_counts = group_medals(df, group_by)
 
     medal_counts = medal_counts.head(limit)
-    ax = sns.barplot(medal_counts, y="Total", x="NOC", hue="NOC")
+    ax = sns.barplot(medal_counts, y="Total", x=group_by, hue=group_by)
     for container in ax.containers:
         ax.bar_label(container)
 
