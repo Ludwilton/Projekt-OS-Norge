@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import hashlib as hl
 
 def read_athlete_events(file_path = "athlete_events.csv") -> pd.DataFrame:
     df = pd.read_csv(file_path)
@@ -43,6 +44,19 @@ def plot_top_medals(df: pd.DataFrame, limit=10, group_by='NOC'):
     plt.ylabel('Totalt antal medaljer')
     plt.xticks(rotation=45)
     plt.show()
+
+
+def hash_column(df, column): 
+    '''
+    TODO fix settingwithcopywarning
+    anonymizes specified column on passed df
+    drops specified column
+    returns modified df
+    '''
+    hashed_column= df[column].apply(lambda row_value: hl.sha256(row_value.encode()).hexdigest())
+    df.insert(1,"Name(Hash Value)", hashed_column)
+    df = df.drop(columns=[column])
+    return df
 
 
 if __name__ == "__main__":
