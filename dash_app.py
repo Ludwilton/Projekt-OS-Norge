@@ -41,6 +41,12 @@ class Dash_App:
             Input("btn_norway", "n_clicks_timestamp")
         )(self.update_norway_graph)
         
+        self._app.callback(
+            Output("sport-age-dist-graph", "figure"),
+            Input("btn_new", "n_clicks_timestamp"),
+        )(self.update_sport_age_dist_graph)
+
+        
 
     def update_per_sport_graph(self, sport):
         df = self._df_athletes
@@ -83,6 +89,24 @@ class Dash_App:
         return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sporter där Norge tagit flest medaljer")
     
 
+    def update_sport_age_dist_graph(self, value_sport):
+        
+        df = self._df_athletes.dropna(subset=["Age"])
+
+        df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
+        sports = ["Gymnastics","Shooting","Football","Alpine Skiing"] # TODO, make a dropdown to add or remove sports for easy comparision
+        df_filt = df_filt[df_filt["Sport"].isin(sports)]
+
+
+        return px.box(
+            df_filt,
+            x="Sport",
+            y="Age",
+            title="Medelålder per sport",
+            labels={"Age": "ålders-fördelning (år)", "Sport": "Sport"},
+            color="Sport", 
+        )
+
     def layout(self):
         navbar = dbc.Navbar(
             html.Div(
@@ -109,7 +133,7 @@ class Dash_App:
                     dcc.Graph(id="norway-graph")
                 ], id="norway-content", style={ "display": "none", "position": "relative" }),
                 dbc.Container([
-                    "Här lägger vi grafer med mera"
+                    dcc.Graph(id="sport-age-dist-graph")
                 ], id="new-content", style={ "display": "none", "position": "relative" }),
             ], id="main-div")
         ], style={"padding": "0"})
