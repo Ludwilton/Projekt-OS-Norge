@@ -13,11 +13,6 @@ def group_medals(df: pd.DataFrame, group_by="NOC"):
 
     df_medals = df_medals[["Medal", "Year", "Event", "Games", "Team", "NOC", "Sport"]]
 
-    print(df_medals["Sport"] )
-    # data = df_medals[df_medals["Sport"] == "Table Tennis"].sort_values(by="Year")
-    data = df_medals[df_medals["Event"] == "Table Tennis Women's Singles"].sort_values(by="Year")
-    print(data)
-
     df_medals = df_medals.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
 
     medal_counts = df_medals.groupby([group_by, "Medal"]).size().unstack(fill_value=0)
