@@ -5,24 +5,25 @@ from dash_bootstrap_components._components.Container import Container
 class Layout:
     def __init__(self, app) -> None:
         self._app = app
-        # self._app.callback(Output("main-div", "children"), Input("btn_home", "n_clicks"))(self.btn_home_click)
-        # self._app.callback(Output("main-div", "children"), Input("btn_norway", "n_clicks"))(self.btn_norway_click)
-        
-    def btn_home_click(self, n_clicks):
-        if n_clicks == 0:
-            return
-            
-        print("click")
 
-        return self.get_home_layout()
+        self._app.callback(
+            Output("main-div", "children"),
+            Input("btn_home", "n_clicks_timestamp"),
+            Input("btn_norway", "n_clicks_timestamp")
+        )(self.uppdatera_innehall)
 
-    def btn_norway_click(self, n_clicks):
-        if n_clicks == 0:
-            return
-        
-        print("click")
+    def uppdatera_innehall(self, hem_time, norge_time):
+        print("hem_time", hem_time)
+        print("norge_time", norge_time)
 
-        return self.get_norway_layout()
+        if hem_time is None and norge_time is None:
+            return self.get_home_layout()
+
+        if hem_time is not None and (norge_time is None or hem_time > norge_time):
+            return self.get_home_layout()
+        elif norge_time is not None and (hem_time is None or norge_time > hem_time):
+            return self.get_norway_layout()
+
 
     def get_norway_layout(self):
         return html.Div([
@@ -36,7 +37,7 @@ class Layout:
 
     def layout(self):
         navbar = dbc.Navbar(
-            dbc.Container(
+            html.Div(
                 [
                     dbc.Button("Hem", id="btn_home", className="navbar_button", n_clicks=0),
                     dbc.Button("Norge", id="btn_norway", className="navbar_button", n_clicks=0),
