@@ -106,6 +106,33 @@ class Dash_App:
             labels={"Age": "ålders-fördelning (år)", "Sport": "Sport"},
             color="Sport", 
         )
+    
+# ----- TODO
+    # def age_distribution_sports_graph(self, value_sports):
+    #     df_all_unique_participants = self._df_athletes.drop_duplicates(subset=["ID"])
+    #     df_age_distribution_sports = df_all_unique_participants[df_all_unique_participants["Sport"].isin(["Alpine Skiing", "Gymnastics", "Football", "Shooting"])]
+
+    #     medals_by_country = df_age_distribution_sports.groupby(["NOC", "Sport"])["Medal"].count().reset_index()
+    #     all_medals_df = medals_by_country[medals_by_country["Medal"] > 0]
+    #     df_dist_ = all_medals_df[all_medals_df["Sport"]== "Alpine Skiing"].sort_values(by="Medal", ascending=False)
+
+
+    #     # plt.figure(figsize=(10,5))
+    #     # sns.barplot(shooting_medals, x="NOC", y="Medal", hue="NOC")
+    #     # plt.title("Shooting medals")
+    #     # plt.xticks(rotation=90)
+    #     # plt.tight_layout()
+    #     # plt.show()
+
+    #     return px.box(
+    #         df_filt,
+    #         x="Sport",
+    #         y="Age",
+    #         title="Medelålder per sport",
+    #         labels={"Age": "ålders-fördelning (år)", "Sport": "Sport"},
+    #         color="Sport", 
+    #     )
+
 
     def layout(self):
         navbar = dbc.Navbar(
