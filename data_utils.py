@@ -8,6 +8,12 @@ def read_athlete_events(file_path = "athlete_events.csv") -> pd.DataFrame:
     return df
 
 
+def filter_medal_entries(df: pd.DataFrame):
+    df_medal_entries = df[df["Medal"].notnull()]
+    df_medal_entries = df_medal_entries.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    return df_medal_entries
+
+
 def group_medals(df: pd.DataFrame, group_by="NOC"):
     df_medals = df.dropna(subset=["Medal"])
 
