@@ -9,7 +9,7 @@ sport_options = [{"label": name, "value": symbol} for symbol, name in athletes_d
 
 def update_norway_age_histogram(df):
     norway_athletes = df[df["NOC"] == "NOR"]
-
+ 
     fig = px.histogram(
         norway_athletes, 
         x="Age", 
@@ -34,11 +34,11 @@ def update_per_sport_graph(df, sport):
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     medal_counts = medal_counts.iloc[:20]
 
-    fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=athletes_dict[sport])
+    fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport)
     return fig
 
 
-def update_home_graph(df):
+def most_medals_by_country(df):
 
     medal_counts = group_medals(df, "NOC")
 
@@ -48,16 +48,16 @@ def update_home_graph(df):
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     medal_counts = medal_counts.iloc[:20]
 
-    return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Länder som tagit flest medaljer")
+    return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Countries with most amount of medals", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
-def update_norway_graph(df):
+def norway_top_sports(df): #previously norway home graph something
     df = df[df["NOC"] == "NOR"]
     medal_counts = group_medals(df, "Sport")
 
     medal_counts = medal_counts[medal_counts["Total"] > 0]
 
-    return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sporter där Norge tagit flest medaljer")
+    return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sports with most amount of medals by Norway", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
 def update_sport_age_dist_graph(df):
@@ -73,13 +73,13 @@ def update_sport_age_dist_graph(df):
         df_filt,
         x="Sport",
         y="Age",
-        title="Medelålder per sport",
-        labels={"Age": "ålders-fördelning (år)", "Sport": "Sport"},
+        title="Age distribution by sports",
+        labels={"Age": "Agr distribution (years)", "Sport": "Sport"},
         color="Sport", 
     )
 
 # ----- TODO fix graph function name
-def age_distribution_sports_graph(df, sport="Alpine Skiing"): 
+def medal_distribution_by_country(df, sport="Alpine Skiing"): 
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
     df_age_distribution_sports = df_all_unique_participants[df_all_unique_participants["Sport"].isin(["Alpine Skiing", "Gymnastics", "Football", "Shooting"])]
 
@@ -87,7 +87,7 @@ def age_distribution_sports_graph(df, sport="Alpine Skiing"):
     all_medals_df = medals_by_country[medals_by_country["Medal"] > 0]
     df_dist_ = all_medals_df[all_medals_df["Sport"]== sport].sort_values(by="Medal", ascending=False)
 
-    return px.bar(df_dist_, x="NOC", y="Medal", color="NOC")
+    return px.bar(df_dist_, x="NOC", y="Medal", color="NOC", labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
 
 
 
@@ -130,5 +130,3 @@ def update_norway_medals_per_year_graph(df):
 
 if __name__ == "__main__":
     df = pd.read_csv("athlete_events.csv")
- 
-    fig = age_distribution_sports_graph(df)
