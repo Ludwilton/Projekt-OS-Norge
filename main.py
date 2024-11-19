@@ -11,8 +11,6 @@ server = app.server
 
 df_athletes = pd.read_csv("athlete_events.csv")
 
-athletes_dict = {"Diving": "Dykning", "Football": "Fotboll", "Gymnastics": "Gymnastik", "Swimming": "Simning"}
-
 app.layout = Layout(app, df_athletes).layout()
 
 @app.callback(
