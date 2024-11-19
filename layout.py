@@ -62,7 +62,7 @@ class Layout:
             dbc.Card([
                 dbc.CardBody([
                     html.Img(src="assets/olympic_games.png", style={"width": "54px", "objectFit": "cover", "height": "32px"}),
-                    html.H4("Projekt OS", style={"margin": "0"}),
+                    html.H4("Project Olympic Games", style={"margin": "0"}),
                 ], style={"display": "flex", "alignItems": "center", "gap": "0.75rem"})
             ], style={"marginBottom": "1rem"}),
             tabs
