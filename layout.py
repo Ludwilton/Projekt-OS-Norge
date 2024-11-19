@@ -4,20 +4,15 @@ import graph_module as gm
 
 class Layout:
     def __init__(self, app, df_athletes) -> None:
-        self._app = app
-
         self._df_athletes = df_athletes
-        self._athletes_dict = {"Diving": "Dykning", "Football": "Fotboll", "Gymnastics": "Gymnastik", "Swimming": "Simning"}
-
-        self._sport_options = [{"label": name, "value": symbol}
-                        for symbol, name in self._athletes_dict.items()]
+        self._sport_options = [{"label": sport, "value": sport} for sport in self._df_athletes["Sport"].unique()]
 
 
     def layout(self):
         tab1_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="home-graph", figure=gm.update_home_graph(self._df_athletes)),
+                    dcc.Graph(id="home-graph", figure=gm.most_medals_by_country(self._df_athletes)),
                 ]
             ),
             className="mt-3",
@@ -26,9 +21,9 @@ class Layout:
         tab2_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="norway-graph", figure=gm.update_norway_graph(self._df_athletes)),
-                    dcc.Graph(id="norway-medals-per-year-graph", figure=gm.update_norway_medals_per_year_graph(self._df_athletes)),
-                    dcc.Graph(id="norway-age-histogram", figure=gm.update_norway_age_histogram(self._df_athletes))
+                    dcc.Graph(id="norway-graph", figure=gm.norway_top_sports(self._df_athletes)),
+                    dcc.Graph(id="norway-medals-per-year-graph", figure=gm.norway_medals_per_year(self._df_athletes)),
+                    dcc.Graph(id="norway-age-histogram", figure=gm.norway_age_histogram(self._df_athletes))
                 ]
             ),
             className="mt-3",
@@ -37,7 +32,7 @@ class Layout:
         tab3_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="sport-age-dist-graph", figure=gm.update_sport_age_dist_graph(self._df_athletes))
+                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes))
                 ]
             ),
             className="mt-3",
@@ -56,9 +51,9 @@ class Layout:
 
         tabs = dbc.Tabs(
             [
-                dbc.Tab(tab1_content, label="Hem"),
-                dbc.Tab(tab2_content, label="Norge"),
-                dbc.Tab(tab3_content, label="Knapp"),
+                dbc.Tab(tab1_content, label="Home"),
+                dbc.Tab(tab2_content, label="Norway"),
+                dbc.Tab(tab3_content, label="Button"),
                 dbc.Tab(sports_statistics_content, label="Sports statistics"),
             ]
         )

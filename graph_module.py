@@ -1,13 +1,8 @@
 import plotly_express as px
 from data_utils import group_medals, filter_medal_entries
 import pandas as pd
-import matplotlib.pyplot as plt
 
-athletes_dict = {"Diving": "Dykning", "Football": "Fotboll", "Gymnastics": "Gymnastik", "Swimming": "Simning"}
-sport_options = [{"label": name, "value": symbol} for symbol, name in athletes_dict.items()]
-
-
-def update_norway_age_histogram(df):
+def norway_age_histogram(df):
     norway_athletes = df[df["NOC"] == "NOR"]
  
     fig = px.histogram(
@@ -17,13 +12,12 @@ def update_norway_age_histogram(df):
     )
 
     fig.update_layout(barmode='overlay')
-    fig.update_traces(opacity=0.75)
+    fig.update_traces(opacity=0.75, marker_line_width=1.5)
 
     return fig
 
 
-def update_per_sport_graph(df, sport):
-
+def countries_with_most_medals_in_sport(df, sport):
     df_sport = df[df["Sport"] == sport]
 
     medal_counts = group_medals(df_sport)
@@ -51,7 +45,7 @@ def most_medals_by_country(df):
     return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Countries with most amount of medals", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
-def norway_top_sports(df): #previously norway home graph something
+def norway_top_sports(df):
     df = df[df["NOC"] == "NOR"]
     medal_counts = group_medals(df, "Sport")
 
@@ -60,8 +54,7 @@ def norway_top_sports(df): #previously norway home graph something
     return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sports with most amount of medals by Norway", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
-def update_sport_age_dist_graph(df):
-    
+def age_distribution_by_sports(df):
     df = df.dropna(subset=["Age"])
 
     df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
@@ -78,6 +71,7 @@ def update_sport_age_dist_graph(df):
         color="Sport", 
     )
 
+
 # ----- TODO fix graph function name
 def medal_distribution_by_country(df, sport="Alpine Skiing"): 
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
@@ -90,8 +84,7 @@ def medal_distribution_by_country(df, sport="Alpine Skiing"):
     return px.bar(df_dist_, x="NOC", y="Medal", color="NOC", labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
 
 
-
-def update_norway_medals_per_year_graph(df):
+def norway_medals_per_year(df):
     df_norway_medals = filter_medal_entries(df[df["NOC"] == "NOR"])
 
     def prepare_medal_data(df, category_label):
@@ -126,7 +119,3 @@ def update_norway_medals_per_year_graph(df):
     )
 
     return fig
-
-
-if __name__ == "__main__":
-    df = pd.read_csv("athlete_events.csv")
