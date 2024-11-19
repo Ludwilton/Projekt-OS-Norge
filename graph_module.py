@@ -33,7 +33,7 @@ def countries_with_most_medals_in_sport(df, sport):
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     medal_counts = medal_counts.iloc[:20]
 
-    fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport)
+    fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport, color=medal_counts.index)
     return fig
 
 
@@ -97,7 +97,7 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
         marker=dict(color=colors[:num_colors])
     )
         
-        
+
 def subplot_medal_distribution(df, sport1, sport2, sport3, sport4):
     fig = make_subplots(rows=2, cols=2, subplot_titles=[sport1, sport2, sport3, sport4])
     fig.add_trace(medal_distribution_by_country(df, sport=sport1, subplot=True), row=1, col=1)
