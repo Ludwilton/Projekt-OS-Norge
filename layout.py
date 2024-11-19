@@ -1,5 +1,5 @@
 import dash_bootstrap_components as dbc
-from dash import dcc
+from dash import dcc, html
 import graph_module as gm
 
 class Layout:
@@ -18,7 +18,7 @@ class Layout:
             dbc.CardBody(
                 [
                     dcc.Graph(id="home-graph", figure=gm.update_home_graph(self._df_athletes)),
-                    
+
                     dcc.Dropdown(id="dropdown_sports", options=self._sport_options, value="Football"),
                     dcc.Graph(id="medals-per-sport-graph"),
                 ]
@@ -55,5 +55,13 @@ class Layout:
             ]
         )
 
-        return tabs
+        return dbc.Container([
+            dbc.Card([
+                dbc.CardBody([
+                    html.Img(src="assets/olympic_games.png", style={"width": "54px", "objectFit": "cover", "height": "32px"}),
+                    html.H4("Projekt OS", style={"margin": "0"}),
+                ], style={"display": "flex", "alignItems": "center", "gap": "0.75rem"})
+            ], style={"marginBottom": "1rem"}),
+            tabs
+        ])
     
