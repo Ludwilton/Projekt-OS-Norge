@@ -55,7 +55,7 @@ def sport_subplots(df, sport):
     df_sport = df[df["Sport"] == sport]
     fig = make_subplots(rows=2, cols=2, subplot_titles=["Medal Distribution by Country", "", "", ""])
     fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=1, col=1)
-    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=1, col=2)
+    fig.add_trace(age_distribution_by_sports(df_sport, sports=[sport], subplot=True), row=1, col=2) 
     # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=1)
     # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
     fig.update_layout(title=f"Statistics for {sport}", showlegend=False)
@@ -84,22 +84,45 @@ def norway_top_sports(df):
     return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sports with most amount of medals by Norway", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
-def age_distribution_by_sports(df):
+
+def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football","Alpine Skiing"], subplot=False): # update : pass in a list of whatever sports to plot to override
+    '''
+    realized after a while of trying to get this working it is a very stupid way of plotting age distribution for ONE sport
+    https://i.kym-cdn.com/entries/icons/original/000/040/653/goldblum-quote.jpeg
+    code remains for future reference // Ludwig
+    TL:DR dont use this to subplot lol
+    '''
     df = df.dropna(subset=["Age"])
 
     df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
-    sports = ["Gymnastics","Shooting","Football","Alpine Skiing"] # TODO, make a dropdown to add or remove sports for easy comparision
+
     df_filt = df_filt[df_filt["Sport"].isin(sports)]
 
 
-    return px.box(
-        df_filt,
-        x="Sport",
-        y="Age",
-        title="Age distribution by sports",
-        labels={"Age": "Agr distribution (years)", "Sport": "Sport"},
-        color="Sport", 
-    )
+    if subplot: 
+        sport = sports[0] if len(sports) == 1 else None
+        if not sport:
+            raise ValueError("When subplot=True, only one sport should be passed.")
+        
+        sport_data = df_filt[df_filt["Sport"] == sport]
+        trace = go.Box(
+            y=sport_data["Age"],
+            name=sport,
+            marker_color=px.colors.qualitative.Plotly[0]
+        )
+        return trace
+    else:
+        fig = px.box(
+            df_filt,
+            x="Sport",
+            y="Age",
+            title="Age distribution by sports",
+            labels={"Age": "Agr distribution (years)", "Sport": "Sport"},
+            color="Sport"
+        )
+        fig.update_layout(showlegend = False)
+    
+    return fig
 
 
 def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False): 
@@ -111,8 +134,8 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
     df_dist_ = all_medals_df[all_medals_df["Sport"]== sport].sort_values(by="Medal", ascending=False)
     
     if subplot:
-        num_colors = len(df_dist_["NOC"])
-        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1)
+        num_colors = len(df_dist_["NOC"]) # gpt
+        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1) # gpt
         return go.Bar(
         x=df_dist_["NOC"],
         y=df_dist_["Medal"],
