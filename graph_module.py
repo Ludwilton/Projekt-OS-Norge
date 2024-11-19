@@ -21,10 +21,12 @@ def norway_age_histogram(df):
 
 
 def countries_with_most_medals_in_sport(df, sport, subplot=False):
+
     if subplot:
         df_sport = df
     else:
         df_sport = df[df["Sport"] == sport]
+
 
     medal_counts = group_medals(df_sport)
 
@@ -58,6 +60,7 @@ def sport_subplots(df, sport):
     # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
     fig.update_layout(title=f"Statistics for {sport}", showlegend=False)
     return fig
+
 
 def most_medals_by_country(df):
 
@@ -99,7 +102,6 @@ def age_distribution_by_sports(df):
     )
 
 
-# ----- TODO fix graph function name
 def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False): 
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
     df_age_distribution_sports = df_all_unique_participants[df_all_unique_participants["Sport"].isin(["Alpine Skiing", "Gymnastics", "Football", "Shooting"])]
@@ -107,9 +109,8 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
     medals_by_country = df_age_distribution_sports.groupby(["NOC", "Sport"])["Medal"].count().reset_index()
     all_medals_df = medals_by_country[medals_by_country["Medal"] > 0]
     df_dist_ = all_medals_df[all_medals_df["Sport"]== sport].sort_values(by="Medal", ascending=False)
-    if subplot == False:
-        return px.bar(df_dist_, x="NOC", y="Medal", color="NOC", labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
-    elif subplot == True:
+    
+    if subplot:
         num_colors = len(df_dist_["NOC"])
         colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1)
         return go.Bar(
@@ -118,6 +119,9 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
         name=sport,
         marker=dict(color=colors[:num_colors])
     )
+    else:
+        return px.bar(df_dist_, x="NOC", y="Medal", color="NOC", labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
+    
         
 
 def subplot_medal_distribution(df, sport1, sport2, sport3, sport4):
