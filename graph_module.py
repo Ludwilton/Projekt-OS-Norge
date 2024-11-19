@@ -21,7 +21,10 @@ def norway_age_histogram(df):
 
 
 def countries_with_most_medals_in_sport(df, sport, subplot=False):
-    df_sport = df[df["Sport"] == sport]
+    if subplot:
+        df_sport = df
+    else:
+        df_sport = df[df["Sport"] == sport]
 
     medal_counts = group_medals(df_sport)
 
@@ -46,13 +49,14 @@ def countries_with_most_medals_in_sport(df, sport, subplot=False):
         return fig
 
 
-def countries_with_most_medals_in_sport_subplots(df, sport):
-    fig = make_subplots(rows=2, cols=2, subplot_titles=[sport, sport, sport, sport])
-    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=1, col=1)
-    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=1, col=2)
-    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=2, col=1)
-    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=2, col=2)
-    fig.update_layout(title=f"Medal Distribution by Country for {sport}, {sport}, {sport}, {sport}", showlegend=False)
+def sport_subplots(df, sport):
+    df_sport = df[df["Sport"] == sport]
+    fig = make_subplots(rows=2, cols=2, subplot_titles=["Medal Distribution by Country", "", "", ""])
+    fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=1, col=1)
+    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=1, col=2)
+    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=1)
+    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
+    fig.update_layout(title=f"Statistics for {sport}", showlegend=False)
     return fig
 
 def most_medals_by_country(df):
