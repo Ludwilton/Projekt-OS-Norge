@@ -22,7 +22,7 @@ def update_norway_age_histogram(df):
     return fig
 
 
-def update_per_sport_graph(sport, df):
+def update_per_sport_graph(df, sport):
 
     df_sport = df[df["Sport"] == sport]
 
@@ -78,8 +78,8 @@ def update_sport_age_dist_graph(df):
         color="Sport", 
     )
 
-# ----- TODO
-def age_distribution_sports_graph(df, sport="Alpine Skiing"):
+# ----- TODO fix graph function name
+def age_distribution_sports_graph(df, sport="Alpine Skiing"): 
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
     df_age_distribution_sports = df_all_unique_participants[df_all_unique_participants["Sport"].isin(["Alpine Skiing", "Gymnastics", "Football", "Shooting"])]
 
@@ -91,8 +91,8 @@ def age_distribution_sports_graph(df, sport="Alpine Skiing"):
 
 
 
-def update_norway_medals_per_year_graph(self, norway_clicked_time):
-    df_norway_medals = filter_medal_entries(self._df_athletes[self._df_athletes["NOC"] == "NOR"])
+def update_norway_medals_per_year_graph(df):
+    df_norway_medals = filter_medal_entries(df[df["NOC"] == "NOR"])
 
     def prepare_medal_data(df, category_label):
         medal_count = group_medals(df, "Year").sort_values(by="Year")
