@@ -18,9 +18,6 @@ class Layout:
             dbc.CardBody(
                 [
                     dcc.Graph(id="home-graph", figure=gm.update_home_graph(self._df_athletes)),
-
-                    dcc.Dropdown(id="dropdown_sports", options=self._sport_options, value="Football"),
-                    dcc.Graph(id="medals-per-sport-graph"),
                 ]
             ),
             className="mt-3",
@@ -46,12 +43,23 @@ class Layout:
             className="mt-3",
         )
 
+        sports_statistics_content = dbc.Card(
+            dbc.CardBody(
+                [
+                    dcc.Dropdown(id="dropdown_sports", options=self._sport_options, value="Football"),
+                    dcc.Graph(id="medals-per-sport-graph"),
+                ]
+            ),
+            className="mt-3",
+        )
+
 
         tabs = dbc.Tabs(
             [
                 dbc.Tab(tab1_content, label="Hem"),
                 dbc.Tab(tab2_content, label="Norge"),
                 dbc.Tab(tab3_content, label="Knapp"),
+                dbc.Tab(sports_statistics_content, label="Sports statistics"),
             ]
         )
 
