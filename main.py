@@ -20,7 +20,7 @@ app.layout = Layout(app, df_athletes).layout()
     Input("dropdown_sports", "value"),
 )
 def handle_dropdown_sports_change(value):
-    return gm.countries_with_most_medals_in_sport(df_athletes, sport=value)
+    return gm.countries_with_most_medals_in_sport_subplots(df_athletes, sport=value)
 
 
 if __name__ == '__main__':

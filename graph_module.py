@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
-
-
 def norway_age_histogram(df):
     norway_athletes = df[df["NOC"] == "NOR"]
  
@@ -22,7 +20,7 @@ def norway_age_histogram(df):
     return fig
 
 
-def countries_with_most_medals_in_sport(df, sport):
+def countries_with_most_medals_in_sport(df, sport, subplot=False):
     df_sport = df[df["Sport"] == sport]
 
     medal_counts = group_medals(df_sport)
@@ -33,9 +31,29 @@ def countries_with_most_medals_in_sport(df, sport):
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     medal_counts = medal_counts.iloc[:20]
 
-    fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport, color=medal_counts.index)
-    return fig
+    if subplot:
+        num_colors = len(df["NOC"])
+        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1)
+        return go.Bar(
+            x=medal_counts.index,
+            y=medal_counts["Total"],
+            name=sport,
+            marker=dict(color=colors[:num_colors])
+        )
+    else:
+        fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport, color=medal_counts.index)
 
+        return fig
+
+
+def countries_with_most_medals_in_sport_subplots(df, sport):
+    fig = make_subplots(rows=2, cols=2, subplot_titles=[sport, sport, sport, sport])
+    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=1, col=1)
+    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=1, col=2)
+    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=2, col=1)
+    fig.add_trace(countries_with_most_medals_in_sport(df, sport=sport, subplot=True), row=2, col=2)
+    fig.update_layout(title=f"Medal Distribution by Country for {sport}, {sport}, {sport}, {sport}", showlegend=False)
+    return fig
 
 def most_medals_by_country(df):
 
