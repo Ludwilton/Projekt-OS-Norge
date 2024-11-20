@@ -9,7 +9,7 @@ class Layout:
 
 
     def layout(self):
-        tab1_content = dbc.Card(
+        start_content = dbc.Card(
             dbc.CardBody(
                 [
                     dcc.Graph(id="home-graph", figure=gm.most_medals_by_country(self._df_athletes)),
@@ -18,7 +18,7 @@ class Layout:
             className="mt-3",
         )
 
-        tab2_content = dbc.Card(
+        norway_content = dbc.Card(
             dbc.CardBody(
                 [
                     dcc.Graph(id="norway-graph", figure=gm.norway_top_sports(self._df_athletes)),
@@ -38,10 +38,16 @@ class Layout:
             className="mt-3",
         )
 
-        sports_statistics_content = dbc.Card(
+        sports_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Dropdown(id="dropdown_sports", options=self._sport_options, value="Football"),
+                    html.Div([
+                        dcc.Dropdown(id="dropdown-sports", options=self._sport_options, value="Football", clearable=False, style={"flex": "1"}),
+                        html.Div([
+                            dbc.Button(html.I(className="bi bi-caret-left"), id="dropdown-sports-left-btn", n_clicks=0),
+                            dbc.Button(html.I(className="bi bi-caret-right"), id="dropdown-sports-right-btn", n_clicks=0),
+                        ], style={"display": "flex", "gap": "0.25rem"}),
+                    ], style={"display": "flex", "gap": "0.75rem"}),
                     dcc.Graph(id="medals-per-sport-graph"),
                 ]
             ),
@@ -51,10 +57,10 @@ class Layout:
 
         tabs = dbc.Tabs(
             [
-                dbc.Tab(tab1_content, label="Home"),
-                dbc.Tab(tab2_content, label="Norway"),
+                dbc.Tab(start_content, label="Start"),
+                dbc.Tab(norway_content, label="Norway"),
                 dbc.Tab(tab3_content, label="Button"),
-                dbc.Tab(sports_statistics_content, label="Sports statistics"),
+                dbc.Tab(sports_content, label="Sports"),
             ]
         )
 

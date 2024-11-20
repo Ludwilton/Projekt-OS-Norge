@@ -21,7 +21,6 @@ def norway_age_histogram(df):
 
 
 def countries_with_most_medals_in_sport(df, sport, subplot=False):
-
     if subplot:
         df_sport = df
     else:
@@ -51,11 +50,36 @@ def countries_with_most_medals_in_sport(df, sport, subplot=False):
         return fig
 
 
+def age_distribution_of_one_sport(df, sport, subplot=False):
+    # TODO: Male och Female måste alltid ha samma färg oavsett om det är flest Male eller Female
+
+    if subplot:
+        df_sport = df
+    else:
+        df_sport = df[df["Sport"] == sport]
+
+    if subplot: 
+        # TODO: Kunna se andel Male och Female i grafen
+        trace = go.Histogram(
+            x=df_sport["Age"],
+            name=sport,
+            marker_color=px.colors.qualitative.Plotly[0]
+        )
+        return trace
+    else:
+        fig = px.histogram(df_sport, x="Age", color="Sex", barmode="overlay", title="Average age of Norwegian Olympic athletes", labels={"Age": "Age", "Sex": "Gender"})
+
+        fig.update_layout(barmode='overlay')
+        fig.update_traces(opacity=0.75, marker_line_width=1.5)
+        
+        return fig
+
+
 def sport_subplots(df, sport):
     df_sport = df[df["Sport"] == sport]
-    fig = make_subplots(rows=2, cols=2, subplot_titles=["Medal Distribution by Country", "", "", ""])
-    fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=1, col=1)
-    fig.add_trace(age_distribution_by_sports(df_sport, sports=[sport], subplot=True), row=1, col=2) 
+    fig = make_subplots(rows=2, cols=2, subplot_titles=["Medal Distribution by Country", "Age Distribution", "", ""])
+    fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport, subplot=True), row=1, col=1)
+    fig.add_trace(age_distribution_of_one_sport(df_sport, sport, subplot=True), row=1, col=2) 
     # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=1)
     # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
     fig.update_layout(title=f"Statistics for {sport}", showlegend=False)
