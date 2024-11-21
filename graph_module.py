@@ -364,3 +364,153 @@ def height_and_weight_of_sport(df: pd.DataFrame, sport = "Football", subplot=Tru
         mode="markers",
         marker={"color": colors},
     )
+
+
+# Anders Norway graphs (below)
+
+def norwegian_gender_age_distribution(df=nor):
+
+    df_age = df.copy()
+    df_age = df_age.drop_duplicates(subset=["Games", "Hash"])
+
+    fig = px.histogram(df, x="Age", color="Sex", 
+                       barmode="overlay", 
+                       title="Ages of Norwegian Olympic Athletes", 
+                       labels={"count": "Amount", "Sex": "Gender"},
+                       color_discrete_sequence=["forestgreen", "orange"])
+    fig.update_traces(marker_line_width=1.5)
+    
+    return fig
+
+
+def norwegian_participants_gender(df=nor_athletes, col="Games"):
+    fig = px.bar(df, x=col, y=["Women", "Men"], 
+                color_discrete_sequence=["orange", "forestgreen"], 
+                title="Norwegian athletes in the Olympics", 
+                labels={"value": "Participants", "variable": "Gender", "Games": ""})
+    fig.update_xaxes(tickangle=-90)
+
+    return fig
+
+
+def norwegian_medals_sport_per_games(df=nor, col="Games"):
+
+    nor_medals_sport = df.copy()
+    nor_medals_sport = nor_medals_sport.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    nor_medals_sport = nor_medals_sport.groupby([col, "Sport"])["Medal"].count().unstack(fill_value=0)
+    nor_medals_sport = nor_medals_sport.reset_index()
+
+    fig = px.bar(nor_medals_sport, x=col, y=nor_medals_sport.columns[1:], 
+                title="Norwegian Olympic medals by sport", 
+                labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals"}, 
+                color_discrete_sequence=px.colors.qualitative.Plotly)
+    fig.update_xaxes(tickangle=-90)
+    
+    return fig
+
+
+# this can be used to visualise both general medals or by gender if arg df is set to a df w/ wom/men
+def norwegian_medals_by_sport(df=nor, headline="Norwegian Olympic medals by sport"):
+
+    def sports_medals():
+
+        sport_medal = df.copy()
+        sport_medal = sport_medal.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+        sport_medal = sport_medal.groupby(["Sport", "Medal"]).size().unstack(fill_value=0)
+        sport_medal["Total"] = sport_medal.sum(axis=1)
+        sport_medal = sport_medal.reindex(columns=["Bronze", "Silver", "Gold", "Total"])
+        sport_medal = sport_medal.sort_values(by="Total", ascending=False)
+        sport_medal = sport_medal.reset_index()
+        
+        return sport_medal
+    
+
+    nor_sports_medals = sports_medals()
+
+    fig = px.bar(nor_sports_medals.head(10), x="Sport", y="Total", title=headline, labels={"Total": "Medals", "Sport": ""}, color="Sport")
+    fig.update_xaxes(tickangle=-90)
+    
+    return fig
+
+
+def norwegian_medals_decade(df=nor):
+
+	nor_wom = nor[nor["Sex"] == "F"]
+	nor_men = nor[nor["Sex"] == "M"]
+	nor_medals = group_medals()
+	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
+	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
+
+	nor_medals_decade = nor_medals.reset_index()
+	temp_men = nor_medals_men.reset_index()
+	temp_wom = nor_medals_wom.reset_index()
+	nor_medals_decade = nor_medals_decade[["Games", "Total"]]
+	temp_men = temp_men[["Games", "Total"]]
+	temp_wom = temp_wom[["Games", "Total"]]
+
+	nor_medals_decade = nor_medals_decade.merge(temp_men, on="Games", how="left")
+	nor_medals_decade = nor_medals_decade.merge(temp_wom, on="Games", how="left").fillna(0)
+	nor_medals_decade["Total"] = nor_medals_decade["Total"].astype(int)
+	nor_medals_decade = nor_medals_decade.rename(columns={"Total_x": "Medals", "Total_y": "Men", "Total": "Women"})
+	nor_medals_decade["Decade"] = nor_medals_decade["Games"].apply(lambda row: int(row[:3] + "0"))
+	nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Men", "Women"]].sum()
+
+	# the below is the result of a Copilot prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
+	fig = make_subplots(rows=1, cols=len(nor_medals_decade), specs=[[{"type": "domain"}] * len(nor_medals_decade)],
+						subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
+
+	for i, row in nor_medals_decade.iterrows():
+		fig.add_trace(go.Pie(labels=["Men", "Women"], values=[row["Men"], row["Women"]], name=f"{row["Decade"]}s",
+							marker_colors=["forestgreen", "orange"]), 1, i+1)
+	# the above is the result of a Copilot prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
+
+	fig.update_layout(title_text="Medals won by male and female athletes per decade")
+	
+	return fig
+
+
+def medal_coloured_bars(df=nor, col="Games"):
+
+    df_medal_count = group_medals()
+    df_medal_count = df_medal_count.reset_index()
+
+    fig = px.bar(df_medal_count, 
+             x=col, y=["Bronze", "Silver", "Gold"], 
+             title="Norwegian Olympic medals", 
+             labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
+             color_discrete_sequence=["#cd7f32", "#c0c0c0", "#ffd700"])
+    fig.update_xaxes(tickangle=-90)
+
+    return fig
+
+
+def norwegian_medals_season(df=nor):
+    
+    nor_medals_winter = df[df["Season"] == "Winter"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    nor_medals_summer = df[df["Season"] == "Summer"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    medals_winter = nor_medals_winter.groupby("Games")["Medal"].count().reset_index(name="Medals")
+    medals_summer = nor_medals_summer.groupby("Games")["Medal"].count().reset_index(name="Medals")
+
+    fig = make_subplots(rows=1, cols=2, subplot_titles=("Winter games", "Summer games"))
+    fig.add_trace(go.Bar(x=medals_winter["Games"], y=medals_winter["Medals"], marker_color="skyblue"), row=1, col=1)
+    fig.add_trace(go.Bar(x=medals_summer["Games"], y=medals_summer["Medals"], marker_color="orange"), row=1, col=2)
+    fig.update_layout(title_text="Norwegian seasonal medals", showlegend=False, yaxis_title="Amount")
+    fig.update_yaxes(range=[0, 35])
+    fig.update_xaxes(tickangle=-90)
+    
+    return fig
+
+
+def top_medals_winter():
+    winter_medals = df[df["Season"] == "Winter"].dropna(subset=["Medal"])
+    winter_medals = winter_medals.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    winter_medals = winter_medals.groupby("NOC")["Medal"].count().reset_index(name="Medals")
+    winter_medals = winter_medals.sort_values(by="Medals", ascending=False)
+
+    fig = px.bar(winter_medals.head(10), x="NOC", y="Medals", title="Olympic winter game medals by country", labels={"NOC": "", "Medals": "Amount"}, color="NOC")
+    fig.update_layout(showlegend=False)
+    
+    return fig
+
+
+# Anders Norway graphs (above)
