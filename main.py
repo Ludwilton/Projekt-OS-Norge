@@ -4,13 +4,14 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from layout import Layout
 import graph_module as gm
+import data_utils
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
 
 server = app.server
 
 df_athletes = pd.read_csv("athlete_events.csv")
-
+df_athletes = data_utils.hash_column(df_athletes, "Name")
 app.layout = Layout(app, df_athletes).layout()
 
 @app.callback(

@@ -15,11 +15,11 @@ def filter_medal_entries(df: pd.DataFrame):
 
 
 def group_medals(df: pd.DataFrame, group_by="NOC"):
-    df_medals = df.dropna(subset=["Medal"])
+    # df_medals = df.dropna(subset=["Medal"])
 
-    df_medals = df_medals[["Medal", "Year", "Event", "Games", "Team", "NOC", "Sport"]]
+    # df_medals = df_medals[["Medal", "Year", "Event", "Games", "Team", "NOC", "Sport"]]
 
-    df_medals = df_medals.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+    df_medals = df.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
 
     medal_counts = df_medals.groupby([group_by, "Medal"]).size().unstack(fill_value=0)
 
