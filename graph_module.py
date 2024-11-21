@@ -11,7 +11,8 @@ def norway_age_histogram(df):
     fig = px.histogram(
         norway_athletes, 
         x="Age", 
-        color="Sex"
+        color="Sex",
+        title="Age distribution by gender"
     )
 
     fig.update_layout(barmode='overlay')
@@ -216,5 +217,19 @@ def norway_medals_per_year(df):
 
     return fig
 
+
+def age_by_gender_by_year(df):
+    no_df = df[df["NOC"]=="NOR"]
+    fig = px.box(
+        no_df,
+        x="Year",
+        y="Age",
+        color="Sex",
+        points=False,
+        title="Age distribution by gender per year"
+
+    )
+    fig.update_layout()
+    return fig
 
 # TODO add title to 3rd graph norway page

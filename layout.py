@@ -23,7 +23,8 @@ class Layout:
                 [
                     dcc.Graph(id="norway-graph", figure=gm.norway_top_sports(self._df_athletes)),
                     dcc.Graph(id="norway-medals-per-year-graph", figure=gm.norway_medals_per_year(self._df_athletes)),
-                    dcc.Graph(id="norway-age-histogram", figure=gm.norway_age_histogram(self._df_athletes))
+                    dcc.Graph(id="norway-age-histogram", figure=gm.norway_age_histogram(self._df_athletes)),
+                    dcc.Graph(id="norway-age-dist-by-gender-each-year", figure=gm.age_by_gender_by_year(self._df_athletes))
                 ]
             ),
             className="mt-3",
