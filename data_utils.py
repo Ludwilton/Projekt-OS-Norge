@@ -21,7 +21,7 @@ def group_medals(df: pd.DataFrame, group_by="NOC"):
     df_medals["Medal"] = df_medals["Medal"].fillna("No Medal")
     df_medals = df_medals.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     medal_counts = df_medals.groupby([group_by, "Medal"]).size().unstack(fill_value=0)
-    medal_counts["Total"] = medal_counts[["Bronze", "Silver", "Gold"]].sum(axis=1)
+    medal_counts["Total"] = medal_counts[["Bronze", "Silver", "Gold"]].sum(axis=1)          # TODO: KeyError: "['Bronze', 'Silver'] not in index" when from dropdown chosing Motorboating/Aeronautics/Alpinism/Basque Pelota/Cricket.
     medal_counts = medal_counts.reindex(columns=["Bronze", "Silver", "Gold", "Total"])
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     return medal_counts
