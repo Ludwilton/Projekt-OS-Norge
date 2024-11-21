@@ -215,3 +215,6 @@ def norway_medals_per_year(df):
     )
 
     return fig
+
+
+# TODO add title to 3rd graph norway page
