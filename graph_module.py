@@ -37,7 +37,7 @@ def countries_with_most_medals_in_sport(df, sport, subplot=False):
 
     if subplot:
         num_colors = len(df["NOC"])
-        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1)
+        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1) # gpt
         return go.Bar(
             x=medal_counts.index,
             y=medal_counts["Total"],

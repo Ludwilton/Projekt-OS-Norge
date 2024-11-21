@@ -32,7 +32,9 @@ class Layout:
         tab3_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes))
+                    dcc.Graph(id="medal-dist-subplot", figure=gm.subplot_medal_distribution(self._df_athletes, "Football","Gymnastics","Alpine Skiing","Shooting")),
+                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"]))
+
                 ]
             ),
             className="mt-3",
@@ -59,7 +61,7 @@ class Layout:
             [
                 dbc.Tab(start_content, label="Start"),
                 dbc.Tab(norway_content, label="Norway"),
-                dbc.Tab(tab3_content, label="Button"),
+                dbc.Tab(tab3_content, label="Sport Selection"),
                 dbc.Tab(sports_content, label="Sports"),
             ]
         )
