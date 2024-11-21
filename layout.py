@@ -13,6 +13,16 @@ class Layout:
             dbc.CardBody(
                 [
                     dcc.Graph(id="home-graph", figure=gm.most_medals_by_country(self._df_athletes)),
+                    html.Div(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(dcc.Graph(id="gender-distribution", figure=gm.gender_distribution(self._df_athletes))),
+                                    dbc.Col(dcc.Graph(id="gender-distribution-by-games", figure=gm.gender_distribution_by_games(self._df_athletes))),
+                                ]
+                            ),
+                        ]
+                    )
                 ]
             ),
             className="mt-3",

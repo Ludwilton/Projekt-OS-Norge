@@ -28,23 +28,29 @@ def handle_dropdown_sports_change(value):
     State("dropdown-sports", "value"),
     State("dropdown-sports", "options")
 )
-def update_dropdown(left_clicks, right_clicks, current_value, options):
-    dropdown_option_values = [option["value"] for option in options]
-    
+def update_dropdown(left_n_clicks, right_n_clicks, current_value, options):
     ctx = dash.callback_context
     if not ctx.triggered:
         return current_value
+    
+    # Get the id of the element that triggered the callback
     button_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    
+    dropdown_option_values = [option["value"] for option in options]
 
+    # Find the index of the currently chosen value in dropdown from the options
     current_index = dropdown_option_values.index(current_value)
 
     if button_id == "dropdown-sports-left-btn":
+        # If left button is clicked select option above the current selected (previous index)
         new_index = (current_index - 1) % len(dropdown_option_values)
     elif button_id == "dropdown-sports-right-btn":
+        # If right button is clicked select option below the current selected (next index)
         new_index = (current_index + 1) % len(dropdown_option_values)
     else:
         new_index = current_index
 
+    # Return the value to the dropdown by the new index
     return dropdown_option_values[new_index]
 
 

@@ -233,3 +233,50 @@ def age_by_gender_by_year(df):
     return fig
 
 # TODO add title to 3rd graph norway page
+
+
+def gender_distribution(df: pd.DataFrame):
+    gender_counts = df["Sex"].value_counts().reset_index()
+    gender_counts.columns = ["Sex", "Count"]
+
+    fig = px.bar(
+        gender_counts,
+        x="Sex",
+        y="Count",
+        title="Gender Distribution",
+        labels={"Sex": "Sex", "Count": "Number of Participants"},
+        color="Sex",
+    )
+
+    return fig
+
+
+def gender_distribution_by_games(df: pd.DataFrame):
+    dist_by_games = df.groupby("Games")["Sex"].value_counts().reset_index()
+
+    fig = px.histogram(dist_by_games, x="Games", y="count", color='Sex', barmode='group')
+    
+    fig.update_layout(
+        title={"text": "Gender Distribution By Games"},
+        yaxis_title="Number of Participants",
+        xaxis_title="Games",
+        legend_title_text="Sex",
+    )
+
+    return fig
+
+
+def events_per_game(df: pd.DataFrame):
+    df = df.drop_duplicates(subset=["Event", "Games"])
+
+    events_per_game = df.groupby("Games")["Event"].value_counts().reset_index()
+
+    fig = px.histogram(events_per_game, x="Games", y="count")
+    
+    fig.update_layout(
+        title={"text": "Events Per Game"},
+        yaxis_title="Number of Events",
+        xaxis_title="Games"
+    )
+
+    return fig
