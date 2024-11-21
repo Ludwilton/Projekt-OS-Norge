@@ -110,51 +110,31 @@ def norway_top_sports(df):
 
 
 
-def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football","Alpine Skiing"], subplot=False): # update : pass in a list of whatever sports to plot to override
-    '''
-    realized after a while of trying to get this working it is a very stupid way of plotting age distribution for ONE sport
-    https://i.kym-cdn.com/entries/icons/original/000/040/653/goldblum-quote.jpeg
-    code remains for future reference // Ludwig
-    TL:DR dont use this to subplot lol
-    '''
+def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football","Alpine Skiing"]): 
+
     df = df.dropna(subset=["Age"])
 
     df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
 
     df_filt = df_filt[df_filt["Sport"].isin(sports)]
 
-
-    if subplot: 
-        sport = sports[0] if len(sports) == 1 else None
-        if not sport:
-            raise ValueError("When subplot=True, only one sport should be passed.")
-        
-        sport_data = df_filt[df_filt["Sport"] == sport]
-        trace = go.Box(
-            y=sport_data["Age"],
-            name=sport,
-            marker_color=px.colors.qualitative.Plotly[0]
-        )
-        return trace
-    else:
-        fig = px.box(
-            df_filt,
-            x="Sport",
-            y="Age",
-            title="Age distribution by sports",
-            labels={"Age": "Agr distribution (years)", "Sport": "Sport"},
-            color="Sport"
-        )
-        fig.update_layout(showlegend = False)
+    fig = px.box(
+        df_filt,
+        x="Sport",
+        y="Age",
+        title="Age distribution by sports",
+        labels={"Age": "Agr distribution (years)", "Sport": "Sport"},
+        color="Sport"
+    )
+    fig.update_layout(showlegend = False)
     
     return fig
 
 
 def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False): 
+    
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
-    df_age_distribution_sports = df_all_unique_participants[df_all_unique_participants["Sport"].isin(["Alpine Skiing", "Gymnastics", "Football", "Shooting"])]
-
-    medals_by_country = df_age_distribution_sports.groupby(["NOC", "Sport"])["Medal"].count().reset_index()
+    medals_by_country = df_all_unique_participants.groupby(["NOC", "Sport"])["Medal"].count().reset_index()
     all_medals_df = medals_by_country[medals_by_country["Medal"] > 0]
     df_dist_ = all_medals_df[all_medals_df["Sport"]== sport].sort_values(by="Medal", ascending=False)
     
