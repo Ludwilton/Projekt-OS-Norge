@@ -61,7 +61,7 @@ class Layout:
                             dbc.Button(html.I(className="bi bi-caret-right"), id="dropdown-sports-right-btn", n_clicks=0),
                         ], style={"display": "flex", "gap": "0.25rem"}),
                     ], style={"display": "flex", "gap": "0.75rem"}),
-                    dcc.Graph(id="medals-per-sport-graph"),
+                    dcc.Graph(id="sports-statistics-graph")
                 ]
             ),
             className="mt-3",

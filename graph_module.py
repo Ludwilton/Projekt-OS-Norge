@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import math
 
 def norway_age_histogram(df):
     norway_athletes = df[df["NOC"] == "NOR"]
@@ -76,14 +77,49 @@ def age_distribution_of_one_sport(df, sport, subplot=False):
         return fig
 
 
+def round_down_to_nearest_ten(number):
+    return math.floor(number / 10) * 10
+
+def round_up_to_nearest_ten(number):
+    return math.ceil(number / 10) * 10
+
+
 def sport_subplots(df, sport):
     df_sport = df[df["Sport"] == sport]
-    fig = make_subplots(rows=2, cols=2, subplot_titles=["Medal Distribution by Country", "Age Distribution", "", ""])
+
+    fig = make_subplots(
+        rows=2, cols=2,
+        subplot_titles=[
+            "Medal Distribution by Country", "Age Distribution", 
+            "Gender Distribution", "Height and Weight Correlation"
+        ]
+    )
+
     fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport, subplot=True), row=1, col=1)
     fig.add_trace(age_distribution_of_one_sport(df_sport, sport, subplot=True), row=1, col=2) 
-    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=1)
-    # fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
-    fig.update_layout(title=f"Statistics for {sport}", showlegend=False)
+    fig.add_trace(gender_distribution_of_sport_subplot(df, sport), row=2, col=1)
+    fig.add_trace(height_and_weight_of_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
+
+    min_height = round_down_to_nearest_ten(df["Height"].min())
+    min_weight = round_down_to_nearest_ten(df["Weight"].min())
+
+    max_height = round_up_to_nearest_ten(df["Height"].max())
+    max_weight = round_up_to_nearest_ten(df["Weight"].max())
+
+    min_age = round_down_to_nearest_ten(df["Age"].min())
+    max_age = round_up_to_nearest_ten(df["Age"].max())
+
+    fig.update_xaxes(range=[min_age, max_age], row=1, col=2)
+
+    fig.update_xaxes(range=[min_weight, max_weight], row=2, col=2)
+    fig.update_yaxes(range=[min_height, max_height], row=2, col=2)
+    
+    fig.update_layout(
+        title=f"Statistics for {sport}",
+        showlegend=False,
+        height=800
+    )
+
     return fig
 
 
@@ -212,7 +248,26 @@ def age_by_gender_by_year(df):
     fig.update_layout()
     return fig
 
+
 # TODO add title to 3rd graph norway page
+
+
+def gender_distribution_of_sport_subplot(df: pd.DataFrame, sport):
+    df = df[df["Sport"] == sport]
+    
+    gender_counts = df["Sex"].value_counts()
+    
+    standard_order = pd.Series([0, 0], index=["M", "F"])
+    gender_counts = standard_order.add(gender_counts, fill_value=0).reset_index()
+    gender_counts.columns = ["Sex", "Count"]
+    gender_counts = gender_counts.sort_values(by="Sex")
+
+    return go.Bar(
+        x=gender_counts["Sex"],
+        y=gender_counts["Count"],
+        marker_color=["red", "blue"],
+        name="Participants",
+    )
 
 
 def gender_distribution(df: pd.DataFrame):
@@ -260,3 +315,16 @@ def events_per_game(df: pd.DataFrame):
     )
 
     return fig
+
+
+def height_and_weight_of_sport(df: pd.DataFrame, sport = "Football", subplot=True):
+    color_map = {"F": "red", "M": "blue"}
+    
+    colors = df["Sex"].map(color_map)
+
+    return go.Scatter(
+        x=df["Weight"],
+        y=df["Height"],
+        mode="markers",
+        marker={"color": colors},
+    )

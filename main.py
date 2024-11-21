@@ -15,7 +15,7 @@ df_athletes = data_utils.hash_column(df_athletes, "Name")
 app.layout = Layout(app, df_athletes).layout()
 
 @app.callback(
-    Output("medals-per-sport-graph", "figure"),
+    Output("sports-statistics-graph", "figure"),
     Input("dropdown-sports", "value"),
 )
 def handle_dropdown_sports_change(value):
