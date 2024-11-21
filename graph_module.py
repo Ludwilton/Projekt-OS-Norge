@@ -6,6 +6,38 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
 
+countries = [ # byt till : "df["NOC"].unique()"
+    "CHN", "DEN", "NED", "USA", "FIN", "NOR", "ROU", "EST", "FRA", "MAR",
+    "ESP", "EGY", "IRI", "BUL", "ITA", "CHA", "AZE", "SUD", "RUS", "ARG",
+    "CUB", "BLR", "GRE", "CMR", "TUR", "CHI", "MEX", "URS", "NCA", "HUN",
+    "NGR", "ALG", "KUW", "BRN", "PAK", "IRQ", "UAR", "LIB", "QAT", "MAS",
+    "GER", "CAN", "IRL", "AUS", "RSA", "ERI", "TAN", "JOR", "TUN", "LBA",
+    "BEL", "DJI", "PLE", "COM", "KAZ", "BRU", "IND", "KSA", "SYR", "MDV",
+    "ETH", "UAE", "YAR", "INA", "PHI", "SGP", "UZB", "KGZ", "TJK", "EUN",
+    "JPN", "CGO", "SUI", "BRA", "FRG", "GDR", "MON", "ISR", "URU", "SWE",
+    "ISV", "SRI", "ARM", "CIV", "KEN", "BEN", "UKR", "GBR", "GHA", "SOM",
+    "LAT", "NIG", "MLI", "AFG", "POL", "CRC", "PAN", "GEO", "SLO", "CRO",
+    "GUY", "NZL", "POR", "PAR", "ANG", "VEN", "COL", "BAN", "PER", "ESA",
+    "PUR", "UGA", "HON", "ECU", "TKM", "MRI", "SEY", "TCH", "LUX", "MTN",
+    "CZE", "SKN", "TTO", "DOM", "VIN", "JAM", "LBR", "SUR", "NEP", "MGL",
+    "AUT", "PLW", "LTU", "TOG", "NAM", "AHO", "ISL", "ASA", "SAM", "RWA",
+    "DMA", "HAI", "MLT", "CYP", "GUI", "BIZ", "YMD", "KOR", "THA", "BER",
+    "ANZ", "SCG", "SLE", "PNG", "YEM", "IOA", "OMA", "FIJ", "VAN", "MDA",
+    "YUG", "BAH", "GUA", "SRB", "IVB", "MOZ", "CAF", "MAD", "MAL", "BIH",
+    "GUM", "CAY", "SVK", "BAR", "GBS", "TLS", "COD", "GAB", "SMR", "LAO",
+    "BOT", "ROT", "CAM", "PRK", "SOL", "SEN", "CPV", "CRT", "GEQ", "BOL",
+    "SAA", "AND", "ANT", "ZIM", "GRN", "HKG", "LCA", "FSM", "MYA", "MAW",
+    "ZAM", "RHO", "TPE", "STP", "MKD", "BOH", "TGA", "LIE", "MNE", "GAM",
+    "COK", "ALB", "WIF", "SWZ", "BUR", "NBO", "BDI", "ARU", "NRU", "VNM",
+    "VIE", "BHU", "MHL", "KIR", "UNK", "TUV", "NFL", "KOS", "SSD", "LES"
+]
+
+# används för konsistent unik färg på varje land
+palette = px.colors.qualitative.Light24                                 # gpt
+palette_cycle = palette * (len(countries) // len(palette) + 1)          # gpt
+country_colors = dict(zip(countries, palette_cycle[:len(countries)]))   # gpt
+
+
 def norway_age_histogram(df):
     norway_athletes = df[df["NOC"] == "NOR"]
  
@@ -44,7 +76,7 @@ def countries_with_most_medals_in_sport(df, sport, subplot=False):
             x=medal_counts.index,
             y=medal_counts["Total"],
             name=sport,
-            marker=dict(color=colors[:num_colors])
+            marker=dict(color=[country_colors.get(country, "#000000") for country in medal_counts.index])
         )
     else:
         fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport, color=medal_counts.index)
@@ -181,10 +213,14 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
         x=df_dist_["NOC"],
         y=df_dist_["Medal"],
         name=sport,
-        marker=dict(color=colors[:num_colors])
-    )
+        marker=dict(
+                color=[
+                    country_colors.get(country, "#000000") for country in df_dist_["NOC"]
+                ]  # Use predefined country colors
+            ),
+        )
     else:
-        return px.bar(df_dist_, x="NOC", y="Medal", color="NOC", labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
+        return px.bar(df_dist_, x="NOC", y="Medal", color="NOC",color_discrete_map=country_colors, labels={"Medal": "Medals"}, title=f"Medal distribution in {sport}")
     
         
 
