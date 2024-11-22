@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import hashlib as hl
 import seaborn as sns
+import plotly_express as px 
 
 def read_athlete_events(file_path = "athlete_events.csv") -> pd.DataFrame:
     df = pd.read_csv(file_path)
@@ -51,6 +52,20 @@ def hash_column(df, column):
     return df
 
 
+
+def get_NOC_color():
+    df = read_athlete_events()
+    countries = df["NOC"].unique()
+
+    # används för konsistent unik färg på varje land
+    palette = px.colors.qualitative.Light24                                 # gpt
+    palette_cycle = palette * (len(countries) // len(palette) + 1)          # gpt
+    country_colors = dict(zip(countries, palette_cycle[:len(countries)]))   # gpt
+    return country_colors
+
+
+
+
 if __name__ == "__main__":
     df = pd.read_csv("athlete_events.csv")
     
@@ -62,3 +77,5 @@ if __name__ == "__main__":
     # print(norway_medals_per_sport)
 
     plot_top_medals(df)
+
+

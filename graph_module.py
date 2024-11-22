@@ -1,41 +1,12 @@
 import plotly_express as px
-from data_utils import group_medals, filter_medal_entries
+from data_utils import group_medals, filter_medal_entries, get_NOC_color
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
 
-countries = [ # byt till : "df["NOC"].unique()"
-    "CHN", "DEN", "NED", "USA", "FIN", "NOR", "ROU", "EST", "FRA", "MAR",
-    "ESP", "EGY", "IRI", "BUL", "ITA", "CHA", "AZE", "SUD", "RUS", "ARG",
-    "CUB", "BLR", "GRE", "CMR", "TUR", "CHI", "MEX", "URS", "NCA", "HUN",
-    "NGR", "ALG", "KUW", "BRN", "PAK", "IRQ", "UAR", "LIB", "QAT", "MAS",
-    "GER", "CAN", "IRL", "AUS", "RSA", "ERI", "TAN", "JOR", "TUN", "LBA",
-    "BEL", "DJI", "PLE", "COM", "KAZ", "BRU", "IND", "KSA", "SYR", "MDV",
-    "ETH", "UAE", "YAR", "INA", "PHI", "SGP", "UZB", "KGZ", "TJK", "EUN",
-    "JPN", "CGO", "SUI", "BRA", "FRG", "GDR", "MON", "ISR", "URU", "SWE",
-    "ISV", "SRI", "ARM", "CIV", "KEN", "BEN", "UKR", "GBR", "GHA", "SOM",
-    "LAT", "NIG", "MLI", "AFG", "POL", "CRC", "PAN", "GEO", "SLO", "CRO",
-    "GUY", "NZL", "POR", "PAR", "ANG", "VEN", "COL", "BAN", "PER", "ESA",
-    "PUR", "UGA", "HON", "ECU", "TKM", "MRI", "SEY", "TCH", "LUX", "MTN",
-    "CZE", "SKN", "TTO", "DOM", "VIN", "JAM", "LBR", "SUR", "NEP", "MGL",
-    "AUT", "PLW", "LTU", "TOG", "NAM", "AHO", "ISL", "ASA", "SAM", "RWA",
-    "DMA", "HAI", "MLT", "CYP", "GUI", "BIZ", "YMD", "KOR", "THA", "BER",
-    "ANZ", "SCG", "SLE", "PNG", "YEM", "IOA", "OMA", "FIJ", "VAN", "MDA",
-    "YUG", "BAH", "GUA", "SRB", "IVB", "MOZ", "CAF", "MAD", "MAL", "BIH",
-    "GUM", "CAY", "SVK", "BAR", "GBS", "TLS", "COD", "GAB", "SMR", "LAO",
-    "BOT", "ROT", "CAM", "PRK", "SOL", "SEN", "CPV", "CRT", "GEQ", "BOL",
-    "SAA", "AND", "ANT", "ZIM", "GRN", "HKG", "LCA", "FSM", "MYA", "MAW",
-    "ZAM", "RHO", "TPE", "STP", "MKD", "BOH", "TGA", "LIE", "MNE", "GAM",
-    "COK", "ALB", "WIF", "SWZ", "BUR", "NBO", "BDI", "ARU", "NRU", "VNM",
-    "VIE", "BHU", "MHL", "KIR", "UNK", "TUV", "NFL", "KOS", "SSD", "LES"
-]
-
-# används för konsistent unik färg på varje land
-palette = px.colors.qualitative.Light24                                 # gpt
-palette_cycle = palette * (len(countries) // len(palette) + 1)          # gpt
-country_colors = dict(zip(countries, palette_cycle[:len(countries)]))   # gpt
+country_colors = get_NOC_color()
 
 
 def norway_age_histogram(df):
@@ -219,8 +190,6 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
     df_dist_ = all_medals_df[all_medals_df["Sport"]== sport].sort_values(by="Medal", ascending=False)
     
     if subplot:
-        num_colors = len(df_dist_["NOC"]) # gpt
-        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1) # gpt
         return go.Bar(
         x=df_dist_["NOC"],
         y=df_dist_["Medal"],
@@ -228,7 +197,7 @@ def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
         marker=dict(
                 color=[
                     country_colors.get(country, "#000000") for country in df_dist_["NOC"]
-                ]  # Use predefined country colors
+                ]
             ),
         )
     else:
