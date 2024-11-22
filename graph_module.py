@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
 
-country_colors = get_NOC_color()
+country_colors = get_NOC_color()  # TODO i dont like having this as a global variable, should declare this inside every function that uses it instead
 
 
 def norway_age_histogram(df):
@@ -318,15 +318,15 @@ def events_per_game(df: pd.DataFrame):
 
 
 # Anders Norway graphs (below)
-
+# tested by ludwig in notebook and commented any bugs/and potential TODO,s ludwig will implement if OK by anders
 def norwegian_gender_age_distribution(df):
-
-    df_age = df.copy()
-    df_age = df_age.drop_duplicates(subset=["Games", "Hash"])
+    
+    # df_age = df.copy()
+    # df_age = df_age.drop_duplicates(subset=["Games", "Hash"]) # this wasn't being used, also it crashed when testing in notebook.
 
     fig = px.histogram(df, x="Age", color="Sex", 
                        barmode="overlay", 
-                       title="Ages of Norwegian Olympic Athletes", 
+                       title="Ages of Norwegian Olympic Athletes", # TODO hardcoded title
                        labels={"count": "Amount", "Sex": "Gender"},
                        color_discrete_sequence=["forestgreen", "orange"])
     fig.update_traces(marker_line_width=1.5)
@@ -335,9 +335,10 @@ def norwegian_gender_age_distribution(df):
 
 
 def norwegian_participants_gender(df, col="Games"):
-    fig = px.bar(df, x=col, y=["Women", "Men"], 
+
+    fig = px.bar(df, x=col, y=["Women", "Men"], # this line crashes in notebook
                 color_discrete_sequence=["orange", "forestgreen"], 
-                title="Norwegian athletes in the Olympics", 
+                title="Norwegian athletes in the Olympics",  # TODO hardcoded title
                 labels={"value": "Participants", "variable": "Gender", "Games": ""})
     fig.update_xaxes(tickangle=-90)
 
@@ -352,7 +353,7 @@ def norwegian_medals_sport_per_games(df, col="Games"):
     nor_medals_sport = nor_medals_sport.reset_index()
 
     fig = px.bar(nor_medals_sport, x=col, y=nor_medals_sport.columns[1:], 
-                title="Norwegian Olympic medals by sport", 
+                title="Norwegian Olympic medals by sport", # TODO hardcoded title
                 labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals"}, 
                 color_discrete_sequence=px.colors.qualitative.Plotly)
     fig.update_xaxes(tickangle=-90)
@@ -385,7 +386,7 @@ def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
 
 def norwegian_medals_decade(df):
-
+    # this can be refactored quite a lot
 	nor_wom = df[df["Sex"] == "F"]
 	nor_men = df[df["Sex"] == "M"]
 	nor_medals = group_medals()
@@ -418,16 +419,16 @@ def norwegian_medals_decade(df):
 	fig.update_layout(title_text="Medals won by male and female athletes per decade")
 	
 	return fig
+ 
 
+def medal_coloured_bars(df, col="Games"): # This probably expects a NOC filter
 
-def medal_coloured_bars(df, col="Games"):
-
-    df_medal_count = group_medals()
-    df_medal_count = df_medal_count.reset_index()
+    df_medal_count = group_medals(df)
+    df_medal_count = df_medal_count.reset_index() # this returns ['NOC', 'Bronze', 'Silver', 'Gold', 'Total']
 
     fig = px.bar(df_medal_count, 
-             x=col, y=["Bronze", "Silver", "Gold"], 
-             title="Norwegian Olympic medals", 
+             x=col, y=["Bronze", "Silver", "Gold"], # which in turn breaks x=col since "Games" is not in df_medal_counts anymore
+             title="Norwegian Olympic medals",  # TODO title is hardcoded to norway
              labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
              color_discrete_sequence=["#cd7f32", "#c0c0c0", "#ffd700"])
     fig.update_xaxes(tickangle=-90)
@@ -435,8 +436,9 @@ def medal_coloured_bars(df, col="Games"):
     return fig
 
 
-def norwegian_medals_season(df):
-    
+def norwegian_medals_season(df, NOC="NOR"):
+    df = df[df["NOC"]==NOC] # i think this expects a df["NOC"]=="XXX" filter, adding norway as default for now
+
     nor_medals_winter = df[df["Season"] == "Winter"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     nor_medals_summer = df[df["Season"] == "Summer"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     medals_winter = nor_medals_winter.groupby("Games")["Medal"].count().reset_index(name="Medals")
@@ -445,8 +447,9 @@ def norwegian_medals_season(df):
     fig = make_subplots(rows=1, cols=2, subplot_titles=("Winter games", "Summer games"))
     fig.add_trace(go.Bar(x=medals_winter["Games"], y=medals_winter["Medals"], marker_color="skyblue"), row=1, col=1)
     fig.add_trace(go.Bar(x=medals_summer["Games"], y=medals_summer["Medals"], marker_color="orange"), row=1, col=2)
-    fig.update_layout(title_text="Norwegian seasonal medals", showlegend=False, yaxis_title="Amount")
-    fig.update_yaxes(range=[0, 35])
+    fig.update_layout(title_text="Norwegian seasonal medals", showlegend=False, yaxis_title="Amount") # TODO title is hardcoded to norway
+    fig.update_yaxes(range=[0, 35]) 
+
     fig.update_xaxes(tickangle=-90)
     
     return fig

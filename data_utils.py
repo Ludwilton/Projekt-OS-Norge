@@ -53,11 +53,9 @@ def hash_column(df, column):
 
 
 
-def get_NOC_color():
+def get_NOC_color():     # används för konsistent unik färg på varje land
     df = read_athlete_events()
     countries = df["NOC"].unique()
-
-    # används för konsistent unik färg på varje land
     palette = px.colors.qualitative.Light24                                 # gpt
     palette_cycle = palette * (len(countries) // len(palette) + 1)          # gpt
     country_colors = dict(zip(countries, palette_cycle[:len(countries)]))   # gpt
