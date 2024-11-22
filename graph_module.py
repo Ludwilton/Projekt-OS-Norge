@@ -368,7 +368,7 @@ def height_and_weight_of_sport(df: pd.DataFrame, sport = "Football", subplot=Tru
 
 # Anders Norway graphs (below)
 
-def norwegian_gender_age_distribution(df=nor):
+def norwegian_gender_age_distribution(df):
 
     df_age = df.copy()
     df_age = df_age.drop_duplicates(subset=["Games", "Hash"])
@@ -383,7 +383,7 @@ def norwegian_gender_age_distribution(df=nor):
     return fig
 
 
-def norwegian_participants_gender(df=nor_athletes, col="Games"):
+def norwegian_participants_gender(df, col="Games"):
     fig = px.bar(df, x=col, y=["Women", "Men"], 
                 color_discrete_sequence=["orange", "forestgreen"], 
                 title="Norwegian athletes in the Olympics", 
@@ -393,7 +393,7 @@ def norwegian_participants_gender(df=nor_athletes, col="Games"):
     return fig
 
 
-def norwegian_medals_sport_per_games(df=nor, col="Games"):
+def norwegian_medals_sport_per_games(df, col="Games"):
 
     nor_medals_sport = df.copy()
     nor_medals_sport = nor_medals_sport.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
@@ -410,7 +410,7 @@ def norwegian_medals_sport_per_games(df=nor, col="Games"):
 
 
 # this can be used to visualise both general medals or by gender if arg df is set to a df w/ wom/men
-def norwegian_medals_by_sport(df=nor, headline="Norwegian Olympic medals by sport"):
+def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
     def sports_medals():
 
@@ -433,10 +433,10 @@ def norwegian_medals_by_sport(df=nor, headline="Norwegian Olympic medals by spor
     return fig
 
 
-def norwegian_medals_decade(df=nor):
+def norwegian_medals_decade(df):
 
-	nor_wom = nor[nor["Sex"] == "F"]
-	nor_men = nor[nor["Sex"] == "M"]
+	nor_wom = df[df["Sex"] == "F"]
+	nor_men = df[df["Sex"] == "M"]
 	nor_medals = group_medals()
 	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
 	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
@@ -469,7 +469,7 @@ def norwegian_medals_decade(df=nor):
 	return fig
 
 
-def medal_coloured_bars(df=nor, col="Games"):
+def medal_coloured_bars(df, col="Games"):
 
     df_medal_count = group_medals()
     df_medal_count = df_medal_count.reset_index()
@@ -484,7 +484,7 @@ def medal_coloured_bars(df=nor, col="Games"):
     return fig
 
 
-def norwegian_medals_season(df=nor):
+def norwegian_medals_season(df):
     
     nor_medals_winter = df[df["Season"] == "Winter"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     nor_medals_summer = df[df["Season"] == "Summer"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
@@ -501,7 +501,7 @@ def norwegian_medals_season(df=nor):
     return fig
 
 
-def top_medals_winter():
+def top_medals_winter(df):
     winter_medals = df[df["Season"] == "Winter"].dropna(subset=["Medal"])
     winter_medals = winter_medals.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     winter_medals = winter_medals.groupby("NOC")["Medal"].count().reset_index(name="Medals")

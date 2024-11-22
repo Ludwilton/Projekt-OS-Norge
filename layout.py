@@ -5,6 +5,7 @@ import graph_module as gm
 class Layout:
     def __init__(self, app, df_athletes) -> None:
         self._df_athletes = df_athletes
+        self.nor = df_athletes[df_athletes["NOC"] == "NOR"]
         self._sport_options = [{"label": sport, "value": sport} for sport in sorted(self._df_athletes["Sport"].unique())]
 
 
