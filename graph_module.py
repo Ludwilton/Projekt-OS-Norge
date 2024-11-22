@@ -54,102 +54,114 @@ def norway_age_histogram(df):
     return fig
 
 
-def countries_with_most_medals_in_sport(df, sport, subplot=False):
-    if subplot:
-        df_sport = df
-    else:
-        df_sport = df[df["Sport"] == sport]
-
-
-    medal_counts = group_medals(df_sport)
-
-    medal_counts = medal_counts[medal_counts["Total"] > 0]
-
-    # Get top 20 countries by total amount of medals
-    medal_counts = medal_counts.sort_values(by="Total", ascending=False)
-    medal_counts = medal_counts.iloc[:20]
-
-    if subplot:
-        num_colors = len(df["NOC"])
-        colors = px.colors.qualitative.Plotly * (num_colors // len(px.colors.qualitative.Plotly) + 1) # gpt
-        return go.Bar(
-            x=medal_counts.index,
-            y=medal_counts["Total"],
-            name=sport,
-            marker=dict(color=[country_colors.get(country, "#000000") for country in medal_counts.index])
-        )
-    else:
-        fig = px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title=sport, color=medal_counts.index)
-
-        return fig
-
-
-def age_distribution_of_one_sport(df, sport, subplot=False):
-    # TODO: Male och Female måste alltid ha samma färg oavsett om det är flest Male eller Female
-
-    if subplot:
-        df_sport = df
-    else:
-        df_sport = df[df["Sport"] == sport]
-
-    if subplot: 
-        # TODO: Kunna se andel Male och Female i grafen
-        trace = go.Histogram(
-            x=df_sport["Age"],
-            name=sport,
-            marker_color=px.colors.qualitative.Plotly[0]
-        )
-        return trace
-    else:
-        fig = px.histogram(df_sport, x="Age", color="Sex", barmode="overlay", title="Average age of Norwegian Olympic athletes", labels={"Age": "Age", "Sex": "Gender"})
-
-        fig.update_layout(barmode='overlay')
-        fig.update_traces(opacity=0.75, marker_line_width=1.5)
-        
-        return fig
-
-
 def round_down_to_nearest_ten(number):
     return math.floor(number / 10) * 10
+
 
 def round_up_to_nearest_ten(number):
     return math.ceil(number / 10) * 10
 
 
-def sport_subplots(df, sport):
+def sport_subplots(df: pd.DataFrame, sport):
     df_sport = df[df["Sport"] == sport]
+    gender_colors = {"M": "blue", "F": "red"}
 
     fig = make_subplots(
         rows=2, cols=2,
         subplot_titles=[
-            "Medal Distribution by Country", "Age Distribution", 
-            "Gender Distribution", "Height and Weight Correlation"
+            "Top Medal-Winning Countries",
+            "Age Distribution",
+            "Gender Distribution",
+            "Body Metrics of Athletes",
         ]
     )
 
-    fig.add_trace(countries_with_most_medals_in_sport(df_sport, sport, subplot=True), row=1, col=1)
-    fig.add_trace(age_distribution_of_one_sport(df_sport, sport, subplot=True), row=1, col=2) 
-    fig.add_trace(gender_distribution_of_sport_subplot(df, sport), row=2, col=1)
-    fig.add_trace(height_and_weight_of_sport(df_sport, sport=sport, subplot=True), row=2, col=2)
+    def countries_with_most_medals_in_sport():
+        medal_counts = group_medals(df_sport)
+        medal_counts = medal_counts[medal_counts["Total"] > 0].sort_values(
+            by="Total", ascending=False
+        ).iloc[:20]
+
+        return go.Bar(
+            x=medal_counts.index,
+            y=medal_counts["Total"],
+            name="Medals",
+            marker=dict(
+                color=[
+                    country_colors.get(country, "#000000")
+                    for country in medal_counts.index
+                ]
+            ),
+        )
+
+
+    def age_distribution_by_gender():
+        traces = []
+
+        for gender, color in gender_colors.items():
+            df_gender = df_sport[df_sport["Sex"] == gender]
+            traces.append(
+                go.Histogram(
+                    x=df_gender["Age"],
+                    name="Male" if gender == "M" else "Female",
+                    marker_color=color,
+                    opacity=0.7,
+                )
+            )
+        return traces
+
+
+    def gender_distribution_of_sport():
+        gender_counts = df_sport["Sex"].value_counts().reindex(["M", "F"], fill_value=0)
+
+        return go.Bar(
+            x=["Male", "Female"],
+            y=gender_counts.values,
+            marker_color=["blue", "red"],
+            name="Participants",
+        )
+
+
+    def height_and_weight_correlation():
+        return go.Scatter(
+            x=df_sport["Weight"],
+            y=df_sport["Height"],
+            mode="markers",
+            marker=dict(color=df_sport["Sex"].map(gender_colors)),
+            name="Athletes",
+        )
+
+
+    fig.add_trace(countries_with_most_medals_in_sport(), row=1, col=1)
+    for trace in age_distribution_by_gender():
+        fig.add_trace(trace, row=1, col=2)
+    fig.add_trace(gender_distribution_of_sport(), row=2, col=1)
+    fig.add_trace(height_and_weight_correlation(), row=2, col=2)
 
     min_height = round_down_to_nearest_ten(df["Height"].min())
-    min_weight = round_down_to_nearest_ten(df["Weight"].min())
-
     max_height = round_up_to_nearest_ten(df["Height"].max())
+    min_weight = round_down_to_nearest_ten(df["Weight"].min())
     max_weight = round_up_to_nearest_ten(df["Weight"].max())
-
     min_age = round_down_to_nearest_ten(df["Age"].min())
     max_age = round_up_to_nearest_ten(df["Age"].max())
 
-    fig.update_xaxes(range=[min_age, max_age], row=1, col=2)
+    fig.update_xaxes(title_text="Country (NOC)", row=1, col=1)
+    fig.update_yaxes(title_text="Number of Medals", row=1, col=1)
 
-    fig.update_xaxes(range=[min_weight, max_weight], row=2, col=2)
-    fig.update_yaxes(range=[min_height, max_height], row=2, col=2)
-    
+    fig.update_xaxes(title_text="Age", range=[min_age, max_age], row=1, col=2)
+    fig.update_yaxes(title_text="Number of Participants", row=1, col=2)
+
+    fig.update_xaxes(title_text="Gender", row=2, col=1)
+    fig.update_yaxes(title_text="Number of Participants", row=2, col=1)
+
+    fig.update_xaxes(title_text="Weight (kg)", range=[min_weight, max_weight], row=2, col=2)
+    fig.update_yaxes(title_text="Height (cm)", range=[min_height, max_height], row=2, col=2)
+
     fig.update_layout(
         title=f"Statistics for {sport}",
         showlegend=False,
-        height=800
+        height=800,
+        margin=dict(l=50, r=50, t=100, b=50),
     )
 
     return fig
@@ -288,23 +300,6 @@ def age_by_gender_by_year(df):
 # TODO add title to 3rd graph norway page
 
 
-def gender_distribution_of_sport_subplot(df: pd.DataFrame, sport):
-    df = df[df["Sport"] == sport]
-    
-    gender_counts = df["Sex"].value_counts()
-    
-    standard_order = pd.Series([0, 0], index=["M", "F"])
-    gender_counts = standard_order.add(gender_counts, fill_value=0).reset_index()
-    gender_counts.columns = ["Sex", "Count"]
-    gender_counts = gender_counts.sort_values(by="Sex")
-
-    return go.Bar(
-        x=gender_counts["Sex"],
-        y=gender_counts["Count"],
-        marker_color=["red", "blue"],
-        name="Participants",
-    )
-
 
 def gender_distribution(df: pd.DataFrame):
     gender_counts = df["Sex"].value_counts().reset_index()
@@ -351,19 +346,6 @@ def events_per_game(df: pd.DataFrame):
     )
 
     return fig
-
-
-def height_and_weight_of_sport(df: pd.DataFrame, sport = "Football", subplot=True):
-    color_map = {"F": "red", "M": "blue"}
-    
-    colors = df["Sex"].map(color_map)
-
-    return go.Scatter(
-        x=df["Weight"],
-        y=df["Height"],
-        mode="markers",
-        marker={"color": colors},
-    )
 
 
 # Anders Norway graphs (below)
