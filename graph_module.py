@@ -399,7 +399,7 @@ def norwegian_medals_decade(df):
     # this can be refactored quite a lot
 	nor_wom = df[df["Sex"] == "F"]
 	nor_men = df[df["Sex"] == "M"]
-	nor_medals = group_medals(df).sort_values(by="Games")                           # added sort_values since group_medals() sort by "Total" as default
+	nor_medals = group_medals(df, "Games").sort_values(by="Games")
 	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
 	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
 
