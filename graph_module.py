@@ -431,16 +431,20 @@ def norwegian_medals_decade(df):
 	return fig
  
 
-def medal_coloured_bars(df, col="Games"):
+def medal_coloured_bars(df, col="Games", top=False):
 
     df_medal_count = group_medals(df, col).sort_values(by=col)
-    df_medal_count = df_medal_count.reset_index() # this returns ['NOC', 'Bronze', 'Silver', 'Gold', 'Total']
+    df_medal_count = df_medal_count.reset_index()
+
+    if top == True:
+        df_medal_count = df_medal_count.sort_values(by="Total", ascending=False)
+        df_medal_count = df_medal_count.head(20)
 
     fig = px.bar(df_medal_count, 
-             x=col, y=["Bronze", "Silver", "Gold"], # which in turn breaks x=col since "Games" is not in df_medal_counts anymore
-             title="Norwegian Olympic medals",
+             x=col, y=["Bronze", "Silver", "Gold"],
+             title="Olympic medals",
              labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
-             color_discrete_sequence=["#cd7f32", "#c0c0c0", "#ffd700"])
+             color_discrete_sequence=["peru", "silver", "gold"])
     fig.update_xaxes(tickangle=-90)
 
     return fig
