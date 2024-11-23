@@ -5,7 +5,7 @@ import graph_module as gm
 class Layout:
     def __init__(self, app, df_athletes) -> None:
         self._df_athletes = df_athletes
-        self.nor = df_athletes[df_athletes["NOC"] == "NOR"]
+        self._nor_athletes = df_athletes[df_athletes["NOC"] == "NOR"]
         self._sport_options = [{"label": sport, "value": sport} for sport in sorted(self._df_athletes["Sport"].unique())]
 
 
@@ -32,10 +32,17 @@ class Layout:
         norway_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="norway-graph", figure=gm.norway_top_sports(self._df_athletes)),
-                    dcc.Graph(id="norway-medals-per-year-graph", figure=gm.norway_medals_per_year(self._df_athletes)),
-                    dcc.Graph(id="norway-age-histogram", figure=gm.norway_age_histogram(self._df_athletes)),
-                    dcc.Graph(id="norway-age-dist-by-gender-each-year", figure=gm.age_by_gender_by_year(self._df_athletes))
+                    # dcc.Graph(id="norway-participans", figure=gm.norwegian_participants_gender(self._nor_athletes)),          # FIXME: ValueError: All arguments should have the same length. The length of argument `y` is 2, whereas the length of  previously-processed arguments ['Games'] is 4960
+                    dcc.Graph(id="norway-age-histogram", figure=gm.norwegian_gender_age_distribution(self._nor_athletes)),
+                    dcc.Graph(id="norway-age-boxplot", figure=gm.age_by_gender_by_year(self._nor_athletes)),
+                    dcc.Graph(id="norway-sports-colourful", figure=gm.norwegian_medals_sport_per_games(self._nor_athletes)),
+                    # subplots på norwegian_medals_by_sport(nor),                                                               # TODO: re-write with subplots or remove
+                    # subplots på norwegian_medals_by_sport(nor_wom),                                                           # TODO: re-write with subplots or remove
+                    # subplots på norwegian_medals_by_sport(nor_men),                                                           # TODO: re-write with subplots or remove
+                    # dcc.Graph(id="norway-decade", figure=gm.norwegian_medals_decade(self._nor_athletes)),                     # FIXME: KeyError: "['Games'] not in index"
+                    # dcc.Graph(id="norway-medals", figure=gm.medal_coloured_bars(self._nor_athletes)),                         # FIXME: ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['NOC', 'Bronze', 'Silver', 'Gold', 'Total'] but received: Games
+                    dcc.Graph(id="norway-seasons", figure=gm.norwegian_medals_season(self._nor_athletes)),
+                    dcc.Graph(id="norway-winter", figure=gm.top_medals_winter(self._df_athletes)),
                 ]
             ),
             className="mt-3",
