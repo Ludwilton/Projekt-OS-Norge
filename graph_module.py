@@ -318,17 +318,17 @@ def events_per_game(df: pd.DataFrame):
 
 
 # Anders Norway graphs (below)
-# tested by ludwig in notebook and commented any bugs/and potential TODO,s ludwig will implement if OK by anders
+
+
 def norwegian_gender_age_distribution(df):
     
-    # df_age = df.copy()
-    # df_age = df_age.drop_duplicates(subset=["Games", "Hash"]) # this wasn't being used, also it crashed when testing in notebook.
+    df_age = df.drop_duplicates(subset=["Games", "Hash"])
 
-    fig = px.histogram(df, x="Age", color="Sex", 
+    fig = px.histogram(df_age, x="Age", color="Sex", 
                        barmode="overlay", 
-                       title="Ages of Norwegian Olympic Athletes", # TODO hardcoded title
+                       title="Ages of Norwegian Olympic athletes",
                        labels={"count": "Amount", "Sex": "Gender"},
-                       color_discrete_sequence=["forestgreen", "orange"])
+                       color_discrete_sequence=["forestgreen", "orange"])       # TODO: change to universal gender colours
     fig.update_traces(marker_line_width=1.5)
     
     return fig
@@ -336,9 +336,18 @@ def norwegian_gender_age_distribution(df):
 
 def norwegian_participants_gender(df, col="Games"):
 
-    fig = px.bar(df, x=col, y=["Women", "Men"], # this line crashes in notebook
-                color_discrete_sequence=["orange", "forestgreen"], 
-                title="Norwegian athletes in the Olympics",  # TODO hardcoded title
+    nor_wom = df[df["Sex"] == "F"]
+    nor_men = df[df["Sex"] == "M"]
+    nor_participants = df.groupby(col)["Hash"].nunique().reset_index(name="All")                        # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
+    nor_participants_wom = nor_wom.groupby(col)["Hash"].nunique().reset_index(name="Women")             # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
+    nor_participants_men = nor_men.groupby(col)["Hash"].nunique().reset_index(name="Men")               # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
+    nor_participants = nor_participants.merge(nor_participants_wom, on=col, how="left").fillna(0)
+    nor_participants = nor_participants.merge(nor_participants_men, on=col, how="left").fillna(0)
+    nor_participants[["Women", "Men"]] = nor_participants[["Women", "Men"]].astype(int)
+
+    fig = px.bar(nor_participants, x=col, y=["Women", "Men"],
+                color_discrete_sequence=["orange", "forestgreen"],                                      # TODO: change to universal gender colours
+                title="Norwegian athletes in the Olympics",
                 labels={"value": "Participants", "variable": "Gender", "Games": ""})
     fig.update_xaxes(tickangle=-90)
 
@@ -353,7 +362,7 @@ def norwegian_medals_sport_per_games(df, col="Games"):
     nor_medals_sport = nor_medals_sport.reset_index()
 
     fig = px.bar(nor_medals_sport, x=col, y=nor_medals_sport.columns[1:], 
-                title="Norwegian Olympic medals by sport", # TODO hardcoded title
+                title="Norwegian Olympic medals by sport",
                 labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals"}, 
                 color_discrete_sequence=px.colors.qualitative.Plotly)
     fig.update_xaxes(tickangle=-90)
@@ -361,7 +370,7 @@ def norwegian_medals_sport_per_games(df, col="Games"):
     return fig
 
 
-# this can be used to visualise both general medals or by gender if arg df is set to a df w/ wom/men
+# this can be used to visualise both general medals or by gender if arg df is set to a df w/ only wom/men
 def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
     def sports_medals():
@@ -386,10 +395,11 @@ def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
 
 def norwegian_medals_decade(df):
+    # TODO: change to universal gender colours
     # this can be refactored quite a lot
 	nor_wom = df[df["Sex"] == "F"]
 	nor_men = df[df["Sex"] == "M"]
-	nor_medals = group_medals()
+	nor_medals = group_medals(df)
 	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
 	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
 
@@ -421,14 +431,14 @@ def norwegian_medals_decade(df):
 	return fig
  
 
-def medal_coloured_bars(df, col="Games"): # This probably expects a NOC filter
+def medal_coloured_bars(df, col="Games"):
 
     df_medal_count = group_medals(df)
     df_medal_count = df_medal_count.reset_index() # this returns ['NOC', 'Bronze', 'Silver', 'Gold', 'Total']
 
     fig = px.bar(df_medal_count, 
              x=col, y=["Bronze", "Silver", "Gold"], # which in turn breaks x=col since "Games" is not in df_medal_counts anymore
-             title="Norwegian Olympic medals",  # TODO title is hardcoded to norway
+             title="Norwegian Olympic medals",
              labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
              color_discrete_sequence=["#cd7f32", "#c0c0c0", "#ffd700"])
     fig.update_xaxes(tickangle=-90)
@@ -436,8 +446,7 @@ def medal_coloured_bars(df, col="Games"): # This probably expects a NOC filter
     return fig
 
 
-def norwegian_medals_season(df, NOC="NOR"):
-    df = df[df["NOC"]==NOC] # i think this expects a df["NOC"]=="XXX" filter, adding norway as default for now
+def norwegian_medals_season(df):
 
     nor_medals_winter = df[df["Season"] == "Winter"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     nor_medals_summer = df[df["Season"] == "Summer"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
