@@ -327,8 +327,7 @@ def norwegian_gender_age_distribution(df):
     fig = px.histogram(df_age, x="Age", color="Sex", 
                        barmode="overlay", 
                        title="Ages of Norwegian Olympic athletes",
-                       labels={"count": "Amount", "Sex": "Gender"},
-                       color_discrete_sequence=["forestgreen", "orange"])       # TODO: change to universal gender colours
+                       labels={"count": "Amount", "Sex": "Gender"})
     fig.update_traces(marker_line_width=1.5)
     
     return fig
@@ -339,14 +338,13 @@ def norwegian_participants_gender(df, col="Games"):
     nor_wom = df[df["Sex"] == "F"]
     nor_men = df[df["Sex"] == "M"]
     nor_participants = df.groupby(col)["Hash"].nunique().reset_index(name="All")                        # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
-    nor_participants_wom = nor_wom.groupby(col)["Hash"].nunique().reset_index(name="Women")             # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
     nor_participants_men = nor_men.groupby(col)["Hash"].nunique().reset_index(name="Men")               # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
-    nor_participants = nor_participants.merge(nor_participants_wom, on=col, how="left").fillna(0)
+    nor_participants_wom = nor_wom.groupby(col)["Hash"].nunique().reset_index(name="Women")             # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
     nor_participants = nor_participants.merge(nor_participants_men, on=col, how="left").fillna(0)
-    nor_participants[["Women", "Men"]] = nor_participants[["Women", "Men"]].astype(int)
+    nor_participants = nor_participants.merge(nor_participants_wom, on=col, how="left").fillna(0)
+    nor_participants[["Men", "Women"]] = nor_participants[["Men", "Women"]].astype(int)
 
-    fig = px.bar(nor_participants, x=col, y=["Women", "Men"],
-                color_discrete_sequence=["orange", "forestgreen"],                                      # TODO: change to universal gender colours
+    fig = px.bar(nor_participants, x=col, y=["Men", "Women"],
                 title="Norwegian athletes in the Olympics",
                 labels={"value": "Participants", "variable": "Gender", "Games": ""})
     fig.update_xaxes(tickangle=-90)
@@ -422,8 +420,7 @@ def norwegian_medals_decade(df):
 						subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
 
 	for i, row in nor_medals_decade.iterrows():
-		fig.add_trace(go.Pie(labels=["Men", "Women"], values=[row["Men"], row["Women"]], name=f"{row["Decade"]}s",
-							marker_colors=["forestgreen", "orange"]), 1, i+1)
+		fig.add_trace(go.Pie(labels=["Men", "Women"], values=[row["Men"], row["Women"]], name=f"{row["Decade"]}s"), 1, i+1)
 	# the above is the result of a Copilot prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
 
 	fig.update_layout(title_text="Medals won by male and female athletes per decade")
@@ -460,9 +457,8 @@ def norwegian_medals_season(df):
     fig = make_subplots(rows=1, cols=2, subplot_titles=("Winter games", "Summer games"))
     fig.add_trace(go.Bar(x=medals_winter["Games"], y=medals_winter["Medals"], marker_color="skyblue"), row=1, col=1)
     fig.add_trace(go.Bar(x=medals_summer["Games"], y=medals_summer["Medals"], marker_color="orange"), row=1, col=2)
-    fig.update_layout(title_text="Norwegian seasonal medals", showlegend=False, yaxis_title="Amount") # TODO title is hardcoded to norway
+    fig.update_layout(title_text="Norwegian seasonal medals", showlegend=False, yaxis_title="Medals")
     fig.update_yaxes(range=[0, 35]) 
-
     fig.update_xaxes(tickangle=-90)
     
     return fig
@@ -474,7 +470,7 @@ def top_medals_winter(df):
     winter_medals = winter_medals.groupby("NOC")["Medal"].count().reset_index(name="Medals")
     winter_medals = winter_medals.sort_values(by="Medals", ascending=False)
 
-    fig = px.bar(winter_medals.head(10), x="NOC", y="Medals", title="Olympic winter game medals by country", labels={"NOC": "", "Medals": "Amount"}, color="NOC")
+    fig = px.bar(winter_medals.head(10), x="NOC", y="Medals", title="Olympic winter game medals by country", labels={"NOC": ""}, color="NOC")       # TODO: add country colour map (didn't work with the global variable)
     fig.update_layout(showlegend=False)
     
     return fig
