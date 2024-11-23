@@ -47,7 +47,7 @@ def hash_column(df, column):
     returns modified df
     '''
     hashed_column= df[column].apply(lambda row_value: hl.sha256(row_value.encode()).hexdigest())
-    df.insert(1,"Name(Hash Value)", hashed_column)
+    df.insert(1,"Hash", hashed_column)
     df = df.drop(columns=[column])
     return df
 
