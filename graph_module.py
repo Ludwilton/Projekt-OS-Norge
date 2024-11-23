@@ -399,7 +399,7 @@ def norwegian_medals_decade(df):
     # this can be refactored quite a lot
 	nor_wom = df[df["Sex"] == "F"]
 	nor_men = df[df["Sex"] == "M"]
-	nor_medals = group_medals(df)
+	nor_medals = group_medals(df).sort_values(by="Games")                           # added sort_values since group_medals() sort by "Total" as default
 	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
 	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
 
@@ -433,7 +433,7 @@ def norwegian_medals_decade(df):
 
 def medal_coloured_bars(df, col="Games"):
 
-    df_medal_count = group_medals(df)
+    df_medal_count = group_medals(df, col).sort_values(by=col)
     df_medal_count = df_medal_count.reset_index() # this returns ['NOC', 'Bronze', 'Silver', 'Gold', 'Total']
 
     fig = px.bar(df_medal_count, 

@@ -40,7 +40,7 @@ class Layout:
                     # subplots på norwegian_medals_by_sport(nor_wom),                                                           # TODO: re-write with subplots or remove
                     # subplots på norwegian_medals_by_sport(nor_men),                                                           # TODO: re-write with subplots or remove
                     # dcc.Graph(id="norway-decade", figure=gm.norwegian_medals_decade(self._nor_athletes)),                     # FIXME: KeyError: "['Games'] not in index"
-                    # dcc.Graph(id="norway-medals", figure=gm.medal_coloured_bars(self._nor_athletes)),                         # FIXME: ValueError: Value of 'x' is not the name of a column in 'data_frame'. Expected one of ['NOC', 'Bronze', 'Silver', 'Gold', 'Total'] but received: Games
+                    dcc.Graph(id="norway-medals", figure=gm.medal_coloured_bars(self._nor_athletes)),
                     dcc.Graph(id="norway-seasons", figure=gm.norwegian_medals_season(self._nor_athletes)),
                     dcc.Graph(id="norway-winter", figure=gm.top_medals_winter(self._df_athletes)),
                 ]
