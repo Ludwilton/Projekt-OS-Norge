@@ -49,10 +49,12 @@ class Layout:
         tab3_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="medal-dist-subplot", figure=gm.subplot_medal_distribution(self._df_athletes, "Football","Gymnastics","Alpine Skiing","Shooting")),
-                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"])),
-                    dcc.Graph(id="subplot_weight_height_corr", figure=gm.subplot_weight_height_correlation(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"]))
-
+                    dcc.Graph(id="medal-dist-subplot", figure=gm.subplot_medal_distribution(self._df_athletes, "Speed Skating","Gymnastics","Archery","Shooting")),
+                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
+                    dcc.Graph(id="subplot_weight_height_corr", figure=gm.subplot_weight_height_correlation(self._df_athletes, ["Speed Skating","Gymnastics","Archery","Shooting"])),
+                    dcc.Graph(id="weight-dist-graph", figure=gm.weight_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
+                    dcc.Graph(id="height-dist-graph", figure=gm.height_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
+                    dcc.Graph(id="bmi-dist-graph", figure=gm.bmi_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"]))
                 ]
             ),
             className="mt-3",
