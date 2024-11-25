@@ -34,7 +34,11 @@ def sport_subplots(df: pd.DataFrame, sport):
     )
 
     def countries_with_most_medals_in_sport():
+        # Group medals by country
         medal_counts = group_medals(df_sport)
+
+        # Filter to only get countries with medals (Total > 0),
+        # sort by total of medals, and get the top 20 countries with most medals.
         medal_counts = medal_counts[medal_counts["Total"] > 0].sort_values(
             by="Total", ascending=False
         ).iloc[:20]
@@ -55,8 +59,11 @@ def sport_subplots(df: pd.DataFrame, sport):
     def age_distribution_by_gender():
         traces = []
 
+        # Loop through each gender and create a histogram to visualize the age distribution for both genders.
         for gender, color in gender_colors.items():
             df_gender = df_sport[df_sport["Sex"] == gender]
+
+            # Every histogram is added to the traces-list
             traces.append(
                 go.Histogram(
                     x=df_gender["Age"],
@@ -65,10 +72,13 @@ def sport_subplots(df: pd.DataFrame, sport):
                     opacity=0.7,
                 )
             )
+
         return traces
 
 
     def gender_distribution_of_sport():
+        # Ensures that "gender_counts" always includes the indexes "M" and "F", even if either is missing in df_sport["Sex"].
+        # Uses fill_value=0 to set the value to 0 for missing data.
         gender_counts = df_sport["Sex"].value_counts().reindex(["M", "F"], fill_value=0)
 
         return go.Bar(
