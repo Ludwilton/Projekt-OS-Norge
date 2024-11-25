@@ -33,9 +33,8 @@ class Layout:
             dbc.CardBody(
                 [
                     dcc.Graph(id="norway-participans", figure=gm.norwegian_participants_gender(self._nor_athletes)),
-                    # dcc.Graph(id="norway-age-histogram", figure=gm.norwegian_gender_age_distribution(self._nor_athletes)),  # unnecessary since we have the boxplot
-                    dcc.Graph(id="norway-age-boxplot", figure=gm.age_by_gender_by_year(self._nor_athletes)),
                     dcc.Graph(id="norway-decade", figure=gm.norwegian_medals_decade(self._nor_athletes)),
+                    dcc.Graph(id="norway-age-boxplot", figure=gm.age_by_gender_by_year(self._nor_athletes)),
                     dcc.Graph(id="norway-sports-colourful", figure=gm.norwegian_medals_sport_per_games(self._nor_athletes)),
                     # subplots på norwegian_medals_by_sport(nor),                                                             # TODO: re-write with subplots or remove
                     # subplots på norwegian_medals_by_sport(nor_wom),                                                         # TODO: re-write with subplots or remove

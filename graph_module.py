@@ -393,39 +393,51 @@ def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
 
 def norwegian_medals_decade(df):
-    # TODO: change to universal gender colours
-    # this can be refactored quite a lot
-	nor_wom = df[df["Sex"] == "F"]
-	nor_men = df[df["Sex"] == "M"]
-	nor_medals = group_medals(df, "Games").sort_values(by="Games")
-	nor_medals_wom = group_medals(nor_wom, "Games").sort_values(by="Games")
-	nor_medals_men = group_medals(nor_men, "Games").sort_values(by="Games")
 
-	nor_medals_decade = nor_medals.reset_index()
-	temp_men = nor_medals_men.reset_index()
-	temp_wom = nor_medals_wom.reset_index()
-	nor_medals_decade = nor_medals_decade[["Games", "Total"]]
-	temp_men = temp_men[["Games", "Total"]]
-	temp_wom = temp_wom[["Games", "Total"]]
+    def group_and_sort(df, group_by):
+        return group_medals(df, group_by).sort_values(by=group_by).reset_index()[["Games", "Total"]]
 
-	nor_medals_decade = nor_medals_decade.merge(temp_men, on="Games", how="left")
-	nor_medals_decade = nor_medals_decade.merge(temp_wom, on="Games", how="left").fillna(0)
-	nor_medals_decade["Total"] = nor_medals_decade["Total"].astype(int)
-	nor_medals_decade = nor_medals_decade.rename(columns={"Total_x": "Medals", "Total_y": "Men", "Total": "Women"})
-	nor_medals_decade["Decade"] = nor_medals_decade["Games"].apply(lambda row: int(row[:3] + "0"))
-	nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Men", "Women"]].sum()
+    nor_wom = df[df["Sex"] == "F"]
+    nor_men = df[df["Sex"] == "M"]
+    
+    nor_medals_all = group_and_sort(df, "Games")
+    nor_medals_men = group_and_sort(nor_men, "Games")
+    nor_medals_wom = group_and_sort(nor_wom, "Games")
+    
+    nor_medals_decade = nor_medals_all.merge(nor_medals_men, on="Games", how="left", suffixes=("", "_Men"))
+    nor_medals_decade = nor_medals_decade.merge(nor_medals_wom, on="Games", how="left", suffixes=("", "_Women")).fillna(0)
+    
+    nor_medals_decade = nor_medals_decade.rename(columns={"Total": "Medals", "Total_Men": "Men", "Total_Women": "Women"})
+    nor_medals_decade["Decade"] = nor_medals_decade["Games"].apply(lambda row: int(row[:3] + "0"))
+    nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Men", "Women"]].sum()
 
-	# the below is the result of a Copilot prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
-	fig = make_subplots(rows=1, cols=len(nor_medals_decade), specs=[[{"type": "domain"}] * len(nor_medals_decade)],
-						subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
-
-	for i, row in nor_medals_decade.iterrows():
-		fig.add_trace(go.Pie(labels=["Men", "Women"], values=[row["Men"], row["Women"]], name=f"{row["Decade"]}s"), 1, i+1)
-	# the above is the result of a Copilot prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
-
-	fig.update_layout(title_text="Medals won by male and female athletes per decade")
-	
-	return fig
+    num_rows = 2
+    num_cols = 6
+    
+    fig = make_subplots(rows=num_rows, cols=num_cols,
+        specs=[[{"type": "domain"}] * num_cols] * num_rows,
+        subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
+    
+    for i, row in nor_medals_decade.iterrows():
+        row_idx = (i // num_cols) + 1
+        col_idx = (i % num_cols) + 1
+        
+        fig.add_trace(go.Pie(
+                labels=["Men", "Women"],
+                values=[row["Men"], row["Women"]],
+                name=f"{row["Decade"]}s",
+                textposition="inside",
+                textinfo="percent",
+                insidetextorientation="horizontal"),
+                row=row_idx, col=col_idx)
+    
+    fig.update_layout(
+        title_text="Medals won by Norwegian male and female athletes per decade",
+        height=300 * num_rows,
+        showlegend=True,
+        uniformtext=dict(minsize=10, mode="hide"))
+    
+    return fig
  
 
 def medal_coloured_bars(df, col="Games", top=False):
