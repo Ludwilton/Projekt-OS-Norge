@@ -6,7 +6,8 @@ from layout import Layout
 import graph_module as gm
 import data_utils
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.BOOTSTRAP], title="Group 4 - Norway")
+app._favicon = ("./olympic_games.png")
 
 server = app.server
 
@@ -29,7 +30,7 @@ def handle_dropdown_sports_change(value):
     State("dropdown-sports", "value"),
     State("dropdown-sports", "options")
 )
-def update_dropdown(left_n_clicks, right_n_clicks, current_value, options):
+def update_dropdown(left_n_clicks, right_n_clicks, current_value, options): # TODO First 2 params arent being used
     ctx = dash.callback_context
     if not ctx.triggered:
         return current_value
