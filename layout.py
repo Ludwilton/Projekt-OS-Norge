@@ -50,7 +50,8 @@ class Layout:
             dbc.CardBody(
                 [
                     dcc.Graph(id="medal-dist-subplot", figure=gm.subplot_medal_distribution(self._df_athletes, "Football","Gymnastics","Alpine Skiing","Shooting")),
-                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"]))
+                    dcc.Graph(id="sport-age-dist-graph", figure=gm.age_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"])),
+                    dcc.Graph(id="subplot_weight_height_corr", figure=gm.subplot_weight_height_correlation(self._df_athletes, ["Gymnastics","Shooting","Football","Alpine Skiing"]))
 
                 ]
             ),

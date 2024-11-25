@@ -521,3 +521,23 @@ def medals_by_sport_and_sex(df, headline):
 
     return fig
 
+def height_and_weight_correlation_sport_filter(df, sport):
+    df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
+    df_filt = df_filt[df_filt["Sport"] == sport]
+    return go.Scatter(
+        x=df["Weight"],
+        y=df["Height"],
+        mode="markers",
+        # marker=dict(color=df["Sex"].map(gender_colors)),
+        name=sport,
+    )
+
+def subplot_weight_height_correlation(df, sports):
+    sport1, sport2, sport3, sport4 = sports
+    fig = make_subplots(rows=2, cols=2, subplot_titles=[sport1, sport2, sport3, sport4])
+    fig.add_trace(height_and_weight_correlation_sport_filter(df, sport=sport1), row=1, col=1)
+    fig.add_trace(height_and_weight_correlation_sport_filter(df, sport=sport2), row=1, col=2)
+    fig.add_trace(height_and_weight_correlation_sport_filter(df, sport=sport3), row=2, col=1)
+    fig.add_trace(height_and_weight_correlation_sport_filter(df, sport=sport4), row=2, col=2)
+    fig.update_layout(title=f"Medal Distribution by Country for {sport1}, {sport2}, {sport3}, {sport4}", showlegend=False)
+    return fig
