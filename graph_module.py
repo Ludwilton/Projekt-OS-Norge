@@ -248,9 +248,10 @@ def norway_medals_per_year(df):
 
 
 def age_by_gender_by_year(df):
-    df["Sex"] = df["Sex"].apply(lambda x: "Male" if x == "M" else "Female")
+    plot_df = df.copy()
+    plot_df["Sex"] = plot_df["Sex"].apply(lambda x: "Male" if x == "M" else "Female")
     fig = px.box(
-        df,
+        plot_df,
         x="Year",
         y="Age",
         color="Sex",
