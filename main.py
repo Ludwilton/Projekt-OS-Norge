@@ -10,7 +10,7 @@ app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.
 
 server = app.server
 
-df_athletes = pd.read_csv("athlete_events.csv")
+df_athletes = data_utils.read_athlete_events()
 df_athletes = data_utils.hash_column(df_athletes, "Name")
 app.layout = Layout(app, df_athletes).layout()
 

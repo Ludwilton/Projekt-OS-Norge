@@ -67,14 +67,5 @@ def get_NOC_color():     # används för konsistent unik färg på varje land
 
 if __name__ == "__main__":
     df = pd.read_csv("athlete_events.csv")
-    
-    # medals_by_country = group_medals(df, group_by="NOC")
-    # print(medals_by_country)
-
-    # df_norway = df[df["NOC"] == "NOR"]
-    # norway_medals_per_sport = group_medals(df_norway, group_by="Sport")
-    # print(norway_medals_per_sport)
 
     plot_top_medals(df)
-
-
