@@ -317,9 +317,6 @@ def events_per_game(df: pd.DataFrame):
     return fig
 
 
-# Anders Norway graphs (below)
-
-
 def norwegian_gender_age_distribution(df):
     
     df_age = df.drop_duplicates(subset=["Games", "Hash"])
@@ -416,27 +413,23 @@ def norwegian_medals_decade(df):
     num_cols = 6
     
     fig = make_subplots(rows=num_rows, cols=num_cols,
-        specs=[[{"type": "domain"}] * num_cols] * num_rows,
-        subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
+                        specs=[[{"type": "domain"}] * num_cols] * num_rows,
+                        subplot_titles=[f"{decade}s" for decade in nor_medals_decade["Decade"]])
     
     for i, row in nor_medals_decade.iterrows():
         row_idx = (i // num_cols) + 1
         col_idx = (i % num_cols) + 1
         
-        fig.add_trace(go.Pie(
-                labels=["Men", "Women"],
-                values=[row["Men"], row["Women"]],
-                name=f"{row["Decade"]}s",
-                textposition="inside",
-                textinfo="percent",
-                insidetextorientation="horizontal"),
-                row=row_idx, col=col_idx)
+        fig.add_trace(go.Pie(labels=["Men", "Women"],
+                             values=[row["Men"], row["Women"]],
+                             name=f"{row["Decade"]}s",
+                             textposition="inside",
+                             textinfo="percent",
+                             insidetextorientation="horizontal"),
+                             row=row_idx, col=col_idx)
     
-    fig.update_layout(
-        title_text="Medals won by Norwegian male and female athletes per decade",
-        height=300 * num_rows,
-        showlegend=True,
-        uniformtext=dict(minsize=10, mode="hide"))
+    fig.update_layout(title_text="Medals won by Norwegian male and female athletes per decade",
+                      height=300 * num_rows, showlegend=True, uniformtext=dict(minsize=10, mode="hide"))
     # the above code originally came from Copilot with the prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
     
     return fig
@@ -451,11 +444,11 @@ def medal_coloured_bars(df, col="Games", top=False):
         df_medal_count = df_medal_count.sort_values(by="Total", ascending=False)
         df_medal_count = df_medal_count.head(20)
 
-    fig = px.bar(df_medal_count, 
-             x=col, y=["Bronze", "Silver", "Gold"],
-             title="Olympic medals",
-             labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
-             color_discrete_sequence=["peru", "silver", "gold"])
+    fig = px.bar(df_medal_count, x=col, 
+                 y=["Bronze", "Silver", "Gold"],
+                 title="Olympic medals",
+                 labels={"Total": "Medals", "index": "Sport", "Games": "", "value": "Medals", "variable": ""}, 
+                 color_discrete_sequence=["peru", "silver", "gold"])
     fig.update_xaxes(tickangle=-90)
 
     return fig
@@ -490,4 +483,37 @@ def top_medals_winter(df):
     return fig
 
 
-# Anders Norway graphs (above)
+def medals_by_sport_and_gender(df, headline):
+
+    def sports_medals(df, group_by):
+
+        sport_medal = df.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
+        sport_medal = sport_medal.groupby([group_by, "Medal"]).size().unstack(fill_value=0)
+        sport_medal["Total"] = sport_medal.sum(axis=1)
+        sport_medal = sport_medal.reindex(columns=["Bronze", "Silver", "Gold", "Total"])
+        sport_medal = sport_medal.sort_values(by="Total", ascending=False)
+        sport_medal = sport_medal.reset_index()
+        
+        return sport_medal
+    
+    wom = df[df["Sex"] == "F"]
+    men = df[df["Sex"] == "M"]
+
+    sports_medals_all = sports_medals(df, group_by="Sport")
+    sports_medals_men = sports_medals(men, group_by="Sport")
+    sports_medals_wom = sports_medals(wom, group_by="Sport")
+
+    sports_list = sports_medals_all["Sport"].tolist()
+    color_map = {sport: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)] for i, sport in enumerate(sports_list)}     # code from Copilot with the prompt: "Each value in sports_list should have a consistent colour when plotted"
+
+    fig = make_subplots(rows=2, cols=2, subplot_titles=("Overall", "Men", "Women"), specs=[[{"colspan": 2}, None], [{}, {}]])
+    fig.add_trace(go.Bar(x=sports_medals_all["Sport"].head(20), y=sports_medals_all["Total"], name="Overall", marker_color=[color_map[sport] for sport in sports_medals_all["Sport"]]), row=1, col=1)
+    fig.add_trace(go.Bar(x=sports_medals_men["Sport"].head(10), y=sports_medals_men["Total"], name="Men", marker_color=[color_map[sport] for sport in sports_medals_men["Sport"]]), row=2, col=1)
+    fig.add_trace(go.Bar(x=sports_medals_wom["Sport"].head(10), y=sports_medals_wom["Total"], name="Women", marker_color=[color_map[sport] for sport in sports_medals_wom["Sport"]]), row=2, col=2)
+    fig.update_layout(title_text=headline, showlegend=False, height=800)
+    fig.update_yaxes(title_text="Medals")
+    fig.update_xaxes(tickangle=-90)
+
+    return fig
+
+
