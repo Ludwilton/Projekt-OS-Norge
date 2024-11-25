@@ -79,7 +79,7 @@ class Layout:
                 dbc.Tab(start_content, label="Start"),
                 dbc.Tab(norway_content, label="Norway"),
                 dbc.Tab(tab3_content, label="Sport Selection"),
-                dbc.Tab(sports_content, label="Sports"),
+                dbc.Tab(sports_content, label="All Sports"),
             ]
         )
 
