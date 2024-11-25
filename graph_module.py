@@ -494,7 +494,7 @@ def medals_by_sport_and_sex(df, headline):
     sports_list = sports_medals_all["Sport"].tolist()
     color_map = {sport: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)] for i, sport in enumerate(sports_list)}     # code from Copilot with the prompt: "Each value in sports_list should have a consistent colour when plotted"
 
-    fig = make_subplots(rows=2, cols=2, subplot_titles=("Overall", "Male", "Female"), specs=[[{"colspan": 2}, None], [{}, {}]])
+    fig = make_subplots(rows=2, cols=2, subplot_titles=("Overall", "Male", "Female"), specs=[[{"colspan": 2}, None], [{}, {}]])         # code from Copilot with the prompt: "Create a subplot with 2 rows and 2 columns, with the first row spanning both columns"
     fig.add_trace(go.Bar(x=sports_medals_all["Sport"].head(20), y=sports_medals_all["Total"], name="Overall", marker_color=[color_map[sport] for sport in sports_medals_all["Sport"]]), row=1, col=1)
     fig.add_trace(go.Bar(x=sports_medals_men["Sport"].head(10), y=sports_medals_men["Total"], name="Male", marker_color=[color_map[sport] for sport in sports_medals_men["Sport"]]), row=2, col=1)
     fig.add_trace(go.Bar(x=sports_medals_wom["Sport"].head(10), y=sports_medals_wom["Total"], name="Female", marker_color=[color_map[sport] for sport in sports_medals_wom["Sport"]]), row=2, col=2)
