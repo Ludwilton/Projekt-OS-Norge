@@ -99,11 +99,19 @@ def sport_subplots(df: pd.DataFrame, sport):
         )
 
 
+    # Row 1, Col 1
     fig.add_trace(countries_with_most_medals_in_sport(), row=1, col=1)
+
+    # Row 1, Col 2
     for trace in age_distribution_by_gender():
         fig.add_trace(trace, row=1, col=2)
+
+    # Row 2, Col 1
     fig.add_trace(gender_distribution_of_sport(), row=2, col=1)
+
+    # Row 2, Col 2
     fig.add_trace(height_and_weight_correlation(), row=2, col=2)
+
 
     min_height = round_down_to_nearest_ten(df["Height"].min())
     max_height = round_up_to_nearest_ten(df["Height"].max())
@@ -135,7 +143,6 @@ def sport_subplots(df: pd.DataFrame, sport):
 
 
 def most_medals_by_country(df):
-
     medal_counts = group_medals(df, "NOC")
 
     medal_counts = medal_counts[medal_counts["Total"] > 0]
@@ -148,17 +155,15 @@ def most_medals_by_country(df):
 
 
 def norway_top_sports(df):
-    df = df[df["NOC"] == "NOR"]
-    medal_counts = group_medals(df, "Sport")
+    df_norway = df[df["NOC"] == "NOR"]
+    medal_counts = group_medals(df_norway, "Sport")
 
     medal_counts = medal_counts[medal_counts["Total"] > 0]
 
     return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Sports with most amount of medals by Norway", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
 
 
-
-def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football","Alpine Skiing"]): 
-
+def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football","Alpine Skiing"]):
     df = df.dropna(subset=["Age"])
 
     df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
@@ -178,8 +183,7 @@ def age_distribution_by_sports(df, sports = ["Gymnastics","Shooting","Football",
     return fig
 
 
-def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False): 
-    
+def medal_distribution_by_country(df, sport="Alpine Skiing", subplot=False):
     df_all_unique_participants = df.drop_duplicates(subset=["ID"])
     medals_by_country = df_all_unique_participants.groupby(["NOC", "Sport"])["Medal"].count().reset_index()
     all_medals_df = medals_by_country[medals_by_country["Medal"] > 0]
@@ -315,7 +319,6 @@ def events_per_game(df: pd.DataFrame):
 
 
 def norwegian_sex_age_distribution(df):
-    
     df_age = df.drop_duplicates(subset=["Games", "Hash"])
     df_age["Sex"] = df_age["Sex"].apply(lambda x: "Male" if x == "M" else "Female")
 
@@ -330,7 +333,6 @@ def norwegian_sex_age_distribution(df):
 
 
 def norwegian_participants_sex(df, col="Games"):
-
     nor_wom = df[df["Sex"] == "F"]
     nor_men = df[df["Sex"] == "M"]
     nor_participants = df.groupby(col)["Hash"].nunique().reset_index(name="All")                        # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
@@ -349,7 +351,6 @@ def norwegian_participants_sex(df, col="Games"):
 
 
 def norwegian_medals_sport_per_games(df, col="Games"):
-
     nor_medals_sport = df.copy()
     nor_medals_sport = nor_medals_sport.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     nor_medals_sport = nor_medals_sport.groupby([col, "Sport"])["Medal"].count().unstack(fill_value=0)
@@ -368,7 +369,6 @@ def norwegian_medals_sport_per_games(df, col="Games"):
 def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
     def sports_medals():
-
         sport_medal = df.copy()
         sport_medal = sport_medal.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
         sport_medal = sport_medal.groupby(["Sport", "Medal"]).size().unstack(fill_value=0)
@@ -435,7 +435,6 @@ def norwegian_medals_decade(df):
  
 
 def medal_coloured_bars(df, col="Games", top=False):
-
     df_medal_count = group_medals(df, col).sort_values(by=col)
     df_medal_count = df_medal_count.reset_index()
 
@@ -454,7 +453,6 @@ def medal_coloured_bars(df, col="Games", top=False):
 
 
 def norwegian_medals_season(df):
-
     nor_medals_winter = df[df["Season"] == "Winter"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     nor_medals_summer = df[df["Season"] == "Summer"].dropna(subset=["Medal"]).drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
     medals_winter = nor_medals_winter.groupby("Games")["Medal"].count().reset_index(name="Medals")
@@ -485,7 +483,6 @@ def top_medals_winter(df):
 def medals_by_sport_and_sex(df, headline):
 
     def sports_medals(df, group_by):
-
         sport_medal = df.drop_duplicates(subset=["Event", "Games", "Team", "Medal"])
         sport_medal = sport_medal.groupby([group_by, "Medal"]).size().unstack(fill_value=0)
         sport_medal["Total"] = sport_medal.sum(axis=1)
@@ -514,5 +511,4 @@ def medals_by_sport_and_sex(df, headline):
     fig.update_xaxes(tickangle=-90)
 
     return fig
-
 
