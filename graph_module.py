@@ -6,6 +6,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
 
+pd.options.mode.copy_on_write = True        # as to avoid a Pandas FutureWarning
+
 country_colors = get_NOC_color()  # TODO i dont like having this as a global variable, should declare this inside every function that uses it instead
 
 
@@ -304,11 +306,14 @@ def events_per_game(df: pd.DataFrame):
 def norwegian_sex_age_distribution(df):
     
     df_age = df.drop_duplicates(subset=["Games", "Hash"])
+    df_age["Sex"] = df_age["Sex"].apply(lambda x: "Male" if x == "M" else "Female")
 
     fig = px.histogram(df_age, x="Age", color="Sex", 
                        barmode="overlay", 
-                       title="Ages of Norwegian Olympic athletes")
+                       title="Ages of Norwegian Olympic athletes",
+                       )
     fig.update_traces(marker_line_width=1.5)
+    fig.update_yaxes(title_text="Amount")
     
     return fig
 
@@ -318,13 +323,13 @@ def norwegian_participants_sex(df, col="Games"):
     nor_wom = df[df["Sex"] == "F"]
     nor_men = df[df["Sex"] == "M"]
     nor_participants = df.groupby(col)["Hash"].nunique().reset_index(name="All")                        # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
-    nor_participants_men = nor_men.groupby(col)["Hash"].nunique().reset_index(name="Men")               # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
-    nor_participants_wom = nor_wom.groupby(col)["Hash"].nunique().reset_index(name="Women")             # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
+    nor_participants_men = nor_men.groupby(col)["Hash"].nunique().reset_index(name="Male")              # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
+    nor_participants_wom = nor_wom.groupby(col)["Hash"].nunique().reset_index(name="Female")            # FYI: "Hash" will give an error in GMT but not Dash due to hashing function not being run here in GM
     nor_participants = nor_participants.merge(nor_participants_men, on=col, how="left").fillna(0)
     nor_participants = nor_participants.merge(nor_participants_wom, on=col, how="left").fillna(0)
-    nor_participants[["Men", "Women"]] = nor_participants[["Men", "Women"]].astype(int)
+    nor_participants[["Male", "Female"]] = nor_participants[["Male", "Female"]].astype(int)
 
-    fig = px.bar(nor_participants, x=col, y=["Men", "Women"],
+    fig = px.bar(nor_participants, x=col, y=["Male", "Female"],
                 title="Norwegian athletes in the Olympics",
                 labels={"value": "Participants", "variable": "Sex", "Games": ""})
     fig.update_xaxes(tickangle=-90)
@@ -384,12 +389,12 @@ def norwegian_medals_decade(df):
     nor_medals_men = group_and_sort(nor_men, "Games")
     nor_medals_wom = group_and_sort(nor_wom, "Games")
     
-    nor_medals_decade = nor_medals_all.merge(nor_medals_men, on="Games", how="left", suffixes=("", "_Men"))
-    nor_medals_decade = nor_medals_decade.merge(nor_medals_wom, on="Games", how="left", suffixes=("", "_Women")).fillna(0)
+    nor_medals_decade = nor_medals_all.merge(nor_medals_men, on="Games", how="left", suffixes=("", "_Male"))
+    nor_medals_decade = nor_medals_decade.merge(nor_medals_wom, on="Games", how="left", suffixes=("", "_Female")).fillna(0)
     
-    nor_medals_decade = nor_medals_decade.rename(columns={"Total": "Medals", "Total_Men": "Men", "Total_Women": "Women"})
+    nor_medals_decade = nor_medals_decade.rename(columns={"Total": "Medals", "Total_Male": "Male", "Total_Female": "Female"})
     nor_medals_decade["Decade"] = nor_medals_decade["Games"].apply(lambda row: int(row[:3] + "0"))
-    nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Men", "Women"]].sum()
+    nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Male", "Female"]].sum()
 
     # the below code originally came from Copilot with the prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
     num_rows = 2
@@ -403,8 +408,8 @@ def norwegian_medals_decade(df):
         row_idx = (i // num_cols) + 1
         col_idx = (i % num_cols) + 1
         
-        fig.add_trace(go.Pie(labels=["Men", "Women"],
-                             values=[row["Men"], row["Women"]],
+        fig.add_trace(go.Pie(labels=["Male", "Female"],
+                             values=[row["Male"], row["Female"]],
                              name=f"{row["Decade"]}s",
                              textposition="inside",
                              textinfo="percent",
@@ -489,10 +494,10 @@ def medals_by_sport_and_sex(df, headline):
     sports_list = sports_medals_all["Sport"].tolist()
     color_map = {sport: px.colors.qualitative.Plotly[i % len(px.colors.qualitative.Plotly)] for i, sport in enumerate(sports_list)}     # code from Copilot with the prompt: "Each value in sports_list should have a consistent colour when plotted"
 
-    fig = make_subplots(rows=2, cols=2, subplot_titles=("Overall", "Men", "Women"), specs=[[{"colspan": 2}, None], [{}, {}]])
+    fig = make_subplots(rows=2, cols=2, subplot_titles=("Overall", "Male", "Female"), specs=[[{"colspan": 2}, None], [{}, {}]])
     fig.add_trace(go.Bar(x=sports_medals_all["Sport"].head(20), y=sports_medals_all["Total"], name="Overall", marker_color=[color_map[sport] for sport in sports_medals_all["Sport"]]), row=1, col=1)
-    fig.add_trace(go.Bar(x=sports_medals_men["Sport"].head(10), y=sports_medals_men["Total"], name="Men", marker_color=[color_map[sport] for sport in sports_medals_men["Sport"]]), row=2, col=1)
-    fig.add_trace(go.Bar(x=sports_medals_wom["Sport"].head(10), y=sports_medals_wom["Total"], name="Women", marker_color=[color_map[sport] for sport in sports_medals_wom["Sport"]]), row=2, col=2)
+    fig.add_trace(go.Bar(x=sports_medals_men["Sport"].head(10), y=sports_medals_men["Total"], name="Male", marker_color=[color_map[sport] for sport in sports_medals_men["Sport"]]), row=2, col=1)
+    fig.add_trace(go.Bar(x=sports_medals_wom["Sport"].head(10), y=sports_medals_wom["Total"], name="Female", marker_color=[color_map[sport] for sport in sports_medals_wom["Sport"]]), row=2, col=2)
     fig.update_layout(title_text=headline, showlegend=False, height=800)
     fig.update_yaxes(title_text="Medals")
     fig.update_xaxes(tickangle=-90)
