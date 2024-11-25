@@ -9,22 +9,6 @@ import math
 country_colors = get_NOC_color()  # TODO i dont like having this as a global variable, should declare this inside every function that uses it instead
 
 
-def norway_age_histogram(df):
-    norway_athletes = df[df["NOC"] == "NOR"]
- 
-    fig = px.histogram(
-        norway_athletes, 
-        x="Age", 
-        color="Sex",
-        title="Age distribution by gender"
-    )
-
-    fig.update_layout(barmode='overlay')
-    fig.update_traces(opacity=0.75, marker_line_width=1.5)
-
-    return fig
-
-
 def round_down_to_nearest_ten(number):
     return math.floor(number / 10) * 10
 
@@ -317,20 +301,19 @@ def events_per_game(df: pd.DataFrame):
     return fig
 
 
-def norwegian_gender_age_distribution(df):
+def norwegian_sex_age_distribution(df):
     
     df_age = df.drop_duplicates(subset=["Games", "Hash"])
 
     fig = px.histogram(df_age, x="Age", color="Sex", 
                        barmode="overlay", 
-                       title="Ages of Norwegian Olympic athletes",
-                       labels={"count": "Amount", "Sex": "Gender"})
+                       title="Ages of Norwegian Olympic athletes")
     fig.update_traces(marker_line_width=1.5)
     
     return fig
 
 
-def norwegian_participants_gender(df, col="Games"):
+def norwegian_participants_sex(df, col="Games"):
 
     nor_wom = df[df["Sex"] == "F"]
     nor_men = df[df["Sex"] == "M"]
@@ -343,7 +326,7 @@ def norwegian_participants_gender(df, col="Games"):
 
     fig = px.bar(nor_participants, x=col, y=["Men", "Women"],
                 title="Norwegian athletes in the Olympics",
-                labels={"value": "Participants", "variable": "Gender", "Games": ""})
+                labels={"value": "Participants", "variable": "Sex", "Games": ""})
     fig.update_xaxes(tickangle=-90)
 
     return fig
@@ -365,7 +348,7 @@ def norwegian_medals_sport_per_games(df, col="Games"):
     return fig
 
 
-# this can be used to visualise both general medals or by gender if arg df is set to a df w/ only wom/men
+# this can be used to visualise both general medals or by sex if arg df is set to a df w/ only wom/men
 def norwegian_medals_by_sport(df, headline="Norwegian Olympic medals by sport"):
 
     def sports_medals():
@@ -483,7 +466,7 @@ def top_medals_winter(df):
     return fig
 
 
-def medals_by_sport_and_gender(df, headline):
+def medals_by_sport_and_sex(df, headline):
 
     def sports_medals(df, group_by):
 
