@@ -238,15 +238,15 @@ def norway_medals_per_year(df):
 
 
 def age_by_gender_by_year(df):
-    no_df = df[df["NOC"]=="NOR"]
+    df["Sex"] = df["Sex"].apply(lambda x: "Male" if x == "M" else "Female")
     fig = px.box(
-        no_df,
+        df,
         x="Year",
         y="Age",
         color="Sex",
         points=False,
-        title="Age distribution by gender per year"
-
+        title="Age distribution by gender per year",
+        labels={"Sex": ""}
     )
     fig.update_layout()
     return fig
@@ -311,7 +311,7 @@ def norwegian_sex_age_distribution(df):
     fig = px.histogram(df_age, x="Age", color="Sex", 
                        barmode="overlay", 
                        title="Ages of Norwegian Olympic athletes",
-                       )
+                       labels={"Sex": ""})
     fig.update_traces(marker_line_width=1.5)
     fig.update_yaxes(title_text="Amount")
     
@@ -331,7 +331,7 @@ def norwegian_participants_sex(df, col="Games"):
 
     fig = px.bar(nor_participants, x=col, y=["Male", "Female"],
                 title="Norwegian athletes in the Olympics",
-                labels={"value": "Participants", "variable": "Sex", "Games": ""})
+                labels={"value": "Participants", "variable": "", "Games": ""})
     fig.update_xaxes(tickangle=-90)
 
     return fig
