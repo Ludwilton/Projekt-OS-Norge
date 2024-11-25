@@ -151,7 +151,15 @@ def most_medals_by_country(df):
     medal_counts = medal_counts.sort_values(by="Total", ascending=False)
     medal_counts = medal_counts.iloc[:20]
 
-    return px.bar(medal_counts, x=medal_counts.index, y=medal_counts["Total"], title="Countries with most amount of medals", color=medal_counts.index, color_discrete_sequence=px.colors.qualitative.Light24)
+    return px.bar(
+        medal_counts, 
+        x=medal_counts.index, 
+        y=medal_counts["Total"], 
+        title="Countries with most amount of medals", 
+        color=medal_counts.index, 
+        color_discrete_sequence=px.colors.qualitative.Light24,
+        labels={"y": "Number of Medals"}
+    )
 
 
 def norway_top_sports(df):
