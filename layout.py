@@ -54,7 +54,10 @@ class Layout:
                     dcc.Graph(id="subplot_weight_height_corr", figure=gm.subplot_weight_height_correlation(self._df_athletes, ["Speed Skating","Gymnastics","Archery","Shooting"])),
                     dcc.Graph(id="weight-dist-graph", figure=gm.weight_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
                     dcc.Graph(id="height-dist-graph", figure=gm.height_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
-                    dcc.Graph(id="bmi-dist-graph", figure=gm.bmi_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"]))
+                    dcc.Graph(id="bmi-dist-graph", figure=gm.bmi_distribution_by_sports(self._df_athletes, ["Gymnastics","Shooting","Speed Skating","Archery"])),
+                    dcc.Graph(id="bmi-medalist-dist", figure=gm.bmi_distribution_by_sports_medalists(self._df_athletes, ["Speed Skating","Gymnastics","Shooting","Archery"])),
+
+
                 ]
             ),
             className="mt-3",

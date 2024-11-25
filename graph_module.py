@@ -604,3 +604,26 @@ def bmi_distribution_by_sports(df, sports=["Gymnastics", "Shooting", "Football",
     fig.update_layout(showlegend=False)
 
     return fig
+
+
+def bmi_distribution_by_sports_medalists(df, sports=["Gymnastics", "Shooting", "Football", "Alpine Skiing"]):
+    df = df.dropna(subset=["Height", "Weight"])
+
+    df["BMI"] = df["Weight"] / (df["Height"] / 100) ** 2
+
+    df_filt = df.drop_duplicates(subset=["Sport", "Games", "ID"])
+    df_filt = df_filt[df_filt["Sport"].isin(sports)]
+    df_filt = df_filt[df_filt["Medal"].notna()]
+
+    fig = px.box(
+        df_filt,
+        x="Sport",
+        y="BMI",
+        title="BMI distribution by sports for medalists",
+        color="Sport",
+        category_orders={"Sport": sports}
+    )
+    fig.update_layout(showlegend=False)
+    fig.update_yaxes(range=[11,48])
+
+    return fig
