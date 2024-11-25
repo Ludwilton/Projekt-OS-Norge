@@ -411,6 +411,7 @@ def norwegian_medals_decade(df):
     nor_medals_decade["Decade"] = nor_medals_decade["Games"].apply(lambda row: int(row[:3] + "0"))
     nor_medals_decade = nor_medals_decade.groupby("Decade", as_index=False)[["Medals", "Men", "Women"]].sum()
 
+    # the below code originally came from Copilot with the prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
     num_rows = 2
     num_cols = 6
     
@@ -436,6 +437,7 @@ def norwegian_medals_decade(df):
         height=300 * num_rows,
         showlegend=True,
         uniformtext=dict(minsize=10, mode="hide"))
+    # the above code originally came from Copilot with the prompt: "Using plotly express and pandas, how can I plot multiple pie plots with subplots from row values of a dataframe?"
     
     return fig
  
