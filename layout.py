@@ -3,7 +3,7 @@ from dash import dcc, html
 import graph_module as gm
 
 class Layout:
-    def __init__(self, app, df_athletes) -> None:
+    def __init__(self, df_athletes) -> None:
         self._df_athletes = df_athletes
         self._nor_athletes = df_athletes[df_athletes["NOC"] == "NOR"]
         self._sport_options = [{"label": sport, "value": sport} for sport in sorted(self._df_athletes["Sport"].unique())]
@@ -13,7 +13,7 @@ class Layout:
         start_content = dbc.Card(
             dbc.CardBody(
                 [
-                    dcc.Graph(id="home-graph", figure=gm.most_medals_by_country(self._df_athletes)),
+                    dcc.Graph(id="most-medals-by-country", figure=gm.most_medals_by_country(self._df_athletes)),
                     html.Div(
                         [
                             dbc.Row(
@@ -34,9 +34,8 @@ class Layout:
                 [
                     dcc.Graph(id="norway-participans", figure=gm.norwegian_participants_sex(self._nor_athletes)),
                     dcc.Graph(id="norway-decade", figure=gm.norwegian_medals_decade(self._nor_athletes)),
-                    dcc.Graph(id="Norway-age-histogram", figure=gm.norwegian_sex_age_distribution(self._nor_athletes)),      # känns onödigt att ha både denna och boxplot men uppgifter kräver histogram
+                    dcc.Graph(id="Norway-age-histogram", figure=gm.norwegian_sex_age_distribution(self._nor_athletes)),
                     dcc.Graph(id="norway-age-boxplot", figure=gm.age_by_gender_by_year(self._nor_athletes)),
-                    # dcc.Graph(id="norway-sports-colourful", figure=gm.norwegian_medals_sport_per_games(self._nor_athletes)),        # obsolete when we have the graph below?
                     dcc.Graph(id="norway-medals", figure=gm.medal_coloured_bars(self._nor_athletes)),
                     dcc.Graph(id="norway-sports-sex", figure=gm.medals_by_sport_and_sex(self._nor_athletes, "Norway's top performing Olympic sports")),
                     dcc.Graph(id="norway-seasons", figure=gm.norwegian_medals_season(self._nor_athletes)),
@@ -46,7 +45,7 @@ class Layout:
             className="mt-3",
         )
 
-        tab3_content = dbc.Card(
+        sport_selection_content = dbc.Card(
             dbc.CardBody(
                 [
                     dcc.Graph(id="medal-dist-subplot", figure=gm.subplot_medal_distribution(self._df_athletes, "Speed Skating","Gymnastics","Archery","Shooting")),
@@ -63,7 +62,7 @@ class Layout:
             className="mt-3",
         )
 
-        sports_content = dbc.Card(
+        all_sports_content = dbc.Card(
             dbc.CardBody(
                 [
                     html.Div([
@@ -79,13 +78,12 @@ class Layout:
             className="mt-3",
         )
 
-
         tabs = dbc.Tabs(
             [
                 dbc.Tab(start_content, label="Start"),
                 dbc.Tab(norway_content, label="Norway"),
-                dbc.Tab(tab3_content, label="Sport Selection"),
-                dbc.Tab(sports_content, label="All Sports"),
+                dbc.Tab(sport_selection_content, label="Sport Selection"),
+                dbc.Tab(all_sports_content, label="All Sports"),
             ]
         )
 
