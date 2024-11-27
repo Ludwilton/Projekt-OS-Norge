@@ -497,14 +497,16 @@ def sport_subplots(df: pd.DataFrame, sport):
         return traces
 
     def gender_distribution_of_sport():
+        genders = ["M", "F"]
+
         # Ensures that "gender_counts" always includes the indexes "M" and "F", even if either is missing in df_sport["Sex"].
         # Uses fill_value=0 to set the value to 0 for missing data.
-        gender_counts = df_sport["Sex"].value_counts().reindex(["M", "F"], fill_value=0)
+        gender_counts = df_sport["Sex"].value_counts().reindex(genders, fill_value=0)
 
         return go.Bar(
             x=["Male", "Female"],
             y=gender_counts.values,
-            marker_color=df_sport["Sex"].map(gender_colors),
+            marker_color=[gender_colors[gender] for gender in genders],
             name="Participants",
         )
 
